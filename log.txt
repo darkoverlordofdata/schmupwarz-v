@@ -1,0 +1,522 @@
+src/shmupwarz.c:440:17: warning: passing 'char [39]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ v_panic ( tos2("array.insert: index larger than length") ) ;
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:217:19: note: passing argument to parameter 's' here
+string tos2(byte* s);
+                  ^
+src/shmupwarz.c:496:17: warning: passing 'char [25]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ v_panic ( tos2("array.first: empty array") ) ;
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:217:19: note: passing argument to parameter 's' here
+string tos2(byte* s);
+                  ^
+src/shmupwarz.c:511:17: warning: passing 'char [24]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ v_panic ( tos2("array.last: empty array") ) ;
+                ^~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:217:19: note: passing argument to parameter 's' here
+string tos2(byte* s);
+                  ^
+src/shmupwarz.c:662:18: warning: passing 'char [2]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+string res= tos2("[") ;
+                 ^~~
+src/shmupwarz.c:217:19: note: passing argument to parameter 's' here
+string tos2(byte* s);
+                  ^
+src/shmupwarz.c:674:32: warning: passing 'char [3]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ res  = string_add( res , tos2(", ") ) ;
+                               ^~~~
+src/shmupwarz.c:217:19: note: passing argument to parameter 's' here
+string tos2(byte* s);
+                  ^
+src/shmupwarz.c:682:32: warning: passing 'char [2]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ res  = string_add( res , tos2("]") ) ;
+                               ^~~
+src/shmupwarz.c:217:19: note: passing argument to parameter 's' here
+string tos2(byte* s);
+                  ^
+src/shmupwarz.c:697:18: warning: passing 'char [2]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+string res= tos2("[") ;
+                 ^~~
+src/shmupwarz.c:217:19: note: passing argument to parameter 's' here
+string tos2(byte* s);
+                  ^
+src/shmupwarz.c:709:32: warning: passing 'char [3]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ res  = string_add( res , tos2(", ") ) ;
+                               ^~~~
+src/shmupwarz.c:217:19: note: passing argument to parameter 's' here
+string tos2(byte* s);
+                  ^
+src/shmupwarz.c:717:32: warning: passing 'char [2]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ res  = string_add( res , tos2("]") ) ;
+                               ^~~
+src/shmupwarz.c:217:19: note: passing argument to parameter 's' here
+string tos2(byte* s);
+                  ^
+src/shmupwarz.c:739:17: warning: passing 'char [18]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ v_panic ( tos2("tos(): nil string") ) ;
+                ^~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:217:19: note: passing argument to parameter 's' here
+string tos2(byte* s);
+                  ^
+src/shmupwarz.c:754:17: warning: passing 'char [16]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ v_panic ( tos2("tos: nil string") ) ;
+                ^~~~~~~~~~~~~~~~~
+src/shmupwarz.c:217:19: note: passing argument to parameter 's' here
+string tos2(byte* s);
+                  ^
+src/shmupwarz.c:762:19: warning: passing 'byte *' (aka 'unsigned char *') to parameter of type 'const char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+int len= strlen ( s ) ;
+                  ^
+/home/darkoverlordofdata/Documents/Projects/emsdk/fastcomp/emscripten/system/include/libc/string.h:52:28: note: passing argument to parameter here
+size_t strlen (const char *);
+                           ^
+src/shmupwarz.c:776:17: warning: passing 'char [17]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ v_panic ( tos2("tos2: nil string") ) ;
+                ^~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:784:19: warning: passing 'byte *' (aka 'unsigned char *') to parameter of type 'const char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+int len= strlen ( s ) ;
+                  ^
+/home/darkoverlordofdata/Documents/Projects/emsdk/fastcomp/emscripten/system/include/libc/string.h:52:28: note: passing argument to parameter here
+size_t strlen (const char *);
+                           ^
+src/shmupwarz.c:945:17: warning: passing 'byte *' (aka 'unsigned char *') to parameter of type 'const char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  atoi ( s .str ) ;
+                ^~~~~~
+/home/darkoverlordofdata/Documents/Projects/emsdk/fastcomp/emscripten/system/include/libc/stdlib.h:21:23: note: passing argument to parameter here
+int atoi (const char *);
+                      ^
+src/shmupwarz.c:952:17: warning: passing 'byte *' (aka 'unsigned char *') to parameter of type 'const char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  atof ( s .str ) ;
+                ^~~~~~
+/home/darkoverlordofdata/Documents/Projects/emsdk/fastcomp/emscripten/system/include/libc/stdlib.h:24:26: note: passing argument to parameter here
+double atof (const char *);
+                         ^
+src/shmupwarz.c:961:17: warning: passing 'char [24]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ v_panic ( tos2("string.eq(): nil string") ) ;
+                ^~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:1310:15: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("") ;
+              ^~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:1326:15: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("") ;
+              ^~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:1608:15: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("") ;
+              ^~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:1695:26: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ if (string_eq( s , tos2("") ) ) {
+                         ^~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:1699:15: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("") ;
+              ^~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:1733:26: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ if (string_eq( s , tos2("") ) ) {
+                         ^~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:1737:15: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("") ;
+              ^~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2123:15: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("") ;
+              ^~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2142:18: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+string res= tos2("") ;
+                 ^~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2196:38: warning: passing 'char [2]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  array_string_join( s , tos2("\n") ) ;
+                                     ^~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2250:15: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("") ;
+              ^~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2339:17: warning: passing 'char [13]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ v_panic ( tos2("println(NIL)") ) ;
+                ^~~~~~~~~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2353:17: warning: passing 'char [14]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ v_panic ( tos2("eprintln(NIL)") ) ;
+                ^~~~~~~~~~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2384:17: warning: passing 'char [11]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ v_panic ( tos2("malloc(<0)") ) ;
+                ^~~~~~~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2409:17: warning: passing 'char [11]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ v_panic ( tos2("calloc(<0)") ) ;
+                ^~~~~~~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2422:19: warning: passing 'byte *' (aka 'unsigned char *') to parameter of type 'const char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  strlen ( s ) ;
+                  ^
+/home/darkoverlordofdata/Documents/Projects/emsdk/fastcomp/emscripten/system/include/libc/string.h:52:28: note: passing argument to parameter here
+size_t strlen (const char *);
+                           ^
+src/shmupwarz.c:2429:61: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  (Option) { .data =  data , .ok =  1 , .error = tos("", 0) , } ;
+                                                            ^~
+src/shmupwarz.c:734:19: note: passing argument to parameter 's' here
+ string tos(byte* s, int len) {
+                  ^
+src/shmupwarz.c:2453:12: warning: passing 'byte *' (aka 'unsigned char *') to parameter of type 'char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+ sprintf ( buf ,  "%f" ,  d ) ;
+           ^~~
+/home/darkoverlordofdata/Documents/Projects/emsdk/fastcomp/emscripten/system/include/libc/stdio.h:104:29: note: passing argument to parameter here
+int sprintf(char *__restrict, const char *__restrict, ...);
+                            ^
+src/shmupwarz.c:2464:12: warning: passing 'byte *' (aka 'unsigned char *') to parameter of type 'char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+ sprintf ( buf ,  "%f" ,  d ) ;
+           ^~~
+/home/darkoverlordofdata/Documents/Projects/emsdk/fastcomp/emscripten/system/include/libc/stdio.h:104:29: note: passing argument to parameter here
+int sprintf(char *__restrict, const char *__restrict, ...);
+                            ^
+src/shmupwarz.c:2475:12: warning: passing 'byte *' (aka 'unsigned char *') to parameter of type 'char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+ sprintf ( buf ,  "%f" ,  d ) ;
+           ^~~
+/home/darkoverlordofdata/Documents/Projects/emsdk/fastcomp/emscripten/system/include/libc/stdio.h:104:29: note: passing argument to parameter here
+int sprintf(char *__restrict, const char *__restrict, ...);
+                            ^
+src/shmupwarz.c:2486:12: warning: passing 'byte *' (aka 'unsigned char *') to parameter of type 'char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+ sprintf ( buf ,  "%p" ,  ptr ) ;
+           ^~~
+/home/darkoverlordofdata/Documents/Projects/emsdk/fastcomp/emscripten/system/include/libc/stdio.h:104:29: note: passing argument to parameter here
+int sprintf(char *__restrict, const char *__restrict, ...);
+                            ^
+src/shmupwarz.c:2501:15: warning: passing 'char [2]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("0") ;
+              ^~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2560:15: warning: passing 'char [2]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("0") ;
+              ^~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2619:15: warning: passing 'char [2]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("0") ;
+              ^~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2676:15: warning: passing 'char [5]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("true") ;
+              ^~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2682:15: warning: passing 'char [6]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("false") ;
+              ^~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2692:30: warning: passing 'byte *' (aka 'unsigned char *') to parameter of type 'char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+int count= ((int)( sprintf ( hex ,  "0x%x" ,  n ) ) ) ;
+                             ^~~
+/home/darkoverlordofdata/Documents/Projects/emsdk/fastcomp/emscripten/system/include/libc/stdio.h:104:29: note: passing argument to parameter here
+int sprintf(char *__restrict, const char *__restrict, ...);
+                            ^
+src/shmupwarz.c:2705:12: warning: passing 'byte *' (aka 'unsigned char *') to parameter of type 'char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+ sprintf ( hex ,  "0x%x" ,  n ) ;
+           ^~~
+/home/darkoverlordofdata/Documents/Projects/emsdk/fastcomp/emscripten/system/include/libc/stdio.h:104:29: note: passing argument to parameter here
+int sprintf(char *__restrict, const char *__restrict, ...);
+                            ^
+src/shmupwarz.c:2705:29: warning: format specifies type 'unsigned int' but the argument has type 'i64' (aka 'long long') [-Wformat]
+ sprintf ( hex ,  "0x%x" ,  n ) ;
+                     ~~     ^
+                     %llx
+src/shmupwarz.c:2842:15: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("") ;
+              ^~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2858:15: warning: incompatible pointer types passing 'byteptr *' (aka 'unsigned char **') to parameter of type 'byte *' (aka 'unsigned char *'); remove & [-Wincompatible-pointer-types]
+ return  tos (& /*11 EXP:"byte*" GOT:"byteptr" */ buffer , 1 ) ;
+              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:734:19: note: passing argument to parameter 's' here
+ string tos(byte* s, int len) {
+                  ^
+src/shmupwarz.c:2871:15: warning: incompatible pointer types passing 'byteptr *' (aka 'unsigned char **') to parameter of type 'byte *' (aka 'unsigned char *'); remove & [-Wincompatible-pointer-types]
+ return  tos (& /*11 EXP:"byte*" GOT:"byteptr" */ buffer , 2 ) ;
+              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:734:19: note: passing argument to parameter 's' here
+ string tos(byte* s, int len) {
+                  ^
+src/shmupwarz.c:2886:15: warning: incompatible pointer types passing 'byteptr *' (aka 'unsigned char **') to parameter of type 'byte *' (aka 'unsigned char *'); remove & [-Wincompatible-pointer-types]
+ return  tos (& /*11 EXP:"byte*" GOT:"byteptr" */ buffer , 3 ) ;
+              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:734:19: note: passing argument to parameter 's' here
+ string tos(byte* s, int len) {
+                  ^
+src/shmupwarz.c:2903:15: warning: incompatible pointer types passing 'byteptr *' (aka 'unsigned char **') to parameter of type 'byte *' (aka 'unsigned char *'); remove & [-Wincompatible-pointer-types]
+ return  tos (& /*11 EXP:"byte*" GOT:"byteptr" */ buffer , 4 ) ;
+              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:734:19: note: passing argument to parameter 's' here
+ string tos(byte* s, int len) {
+                  ^
+src/shmupwarz.c:2909:15: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("") ;
+              ^~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:2948:18: warning: '&' within '|' [-Wbitwise-op-parentheses]
+ res  =  res | c & 63 ;
+             ~ ~~^~~~
+src/shmupwarz.c:2948:18: note: place parentheses around the '&' expression to silence this warning
+ res  =  res | c & 63 ;
+                 ^
+               (     )
+src/shmupwarz.c:3185:17: warning: passing 'char [9]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ println ( tos2("<<<<<<<<") ) ;
+                ^~~~~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:3193:17: warning: passing 'char [11]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ println ( tos2(">>>>>>>>>>") ) ;
+                ^~~~~~~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:3207:15: warning: passing 'char [3]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ return  tos2("{}") ;
+              ^~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:3212:16: warning: passing 'char [3]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+string s= tos2("{\n") ;
+               ^~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:3218:20: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+string tmp38 = tos("", 0); bool tmp39 = map_get( m , entry .key, & tmp38);
+                   ^~
+src/shmupwarz.c:734:19: note: passing argument to parameter 's' here
+ string tos(byte* s, int len) {
+                  ^
+src/shmupwarz.c:3219:25: warning: passing 'char [1]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+if (!tmp39) tmp38 = tos("", 0);
+                        ^~
+src/shmupwarz.c:734:19: note: passing argument to parameter 's' here
+ string tos(byte* s, int len) {
+                  ^
+src/shmupwarz.c:3228:28: warning: passing 'char [2]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ s  = string_add( s , tos2("}") ) ;
+                           ^~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:3284:17: warning: passing 'char [19]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ println ( tos2("Unable to Init SDL") ) ;
+                ^~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:3303:17: warning: passing 'char [21]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ println ( tos2("Unable to Init image") ) ;
+                ^~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:3308:29: warning: passing 'byte *' (aka 'unsigned char *') to parameter of type 'const char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+void* w= SDL_CreateWindow ( title .str ,  vex__SDL_WINDOWPOS_CENTERED ,  vex__SDL_WINDOWPOS_CENTERED ,  width ,  height ,  vex__SDL_WINDOW_OPENGL | vex__SDL_WINDOW_SHOWN ) ;
+                            ^~~~~~~~~~
+/home/darkoverlordofdata/.emscripten_cache/asmjs/ports-builds/sdl2/include/SDL2/SDL_video.h:486:67: note: passing argument to parameter 'title' here
+extern DECLSPEC SDL_Window * SDLCALL SDL_CreateWindow(const char *title,
+                                                                  ^
+src/shmupwarz.c:3315:17: warning: passing 'char [24]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ println ( tos2("Unable to create window") ) ;
+                ^~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:3344:26: warning: incompatible pointer types passing 'vex__Event *' (aka 'struct vex__Event *') to parameter of type 'SDL_Event *' (aka 'union SDL_Event *') [-Wincompatible-pointer-types]
+ while ( SDL_PollEvent ( & /*vvar*/  event ) != 0 ) {
+                         ^~~~~~~~~~~~~~~~~
+/home/darkoverlordofdata/.emscripten_cache/asmjs/ports-builds/sdl2/include/SDL2/SDL_events.h:629:55: note: passing argument to parameter 'event' here
+extern DECLSPEC int SDLCALL SDL_PollEvent(SDL_Event * event);
+                                                      ^
+src/shmupwarz.c:3346:20: warning: equality comparison with extraneous parentheses [-Wparentheses-equality]
+ if ( ( event .typ ==  ((u32)( vex__SDL_QUIT ) ) )) { /* case */
+        ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:3346:20: note: remove extraneous parentheses around the comparison to silence this warning
+ if ( ( event .typ ==  ((u32)( vex__SDL_QUIT ) ) )) { /* case */
+      ~~           ^                             ~
+src/shmupwarz.c:3346:20: note: use '=' to turn this equality comparison into an assignment
+ if ( ( event .typ ==  ((u32)( vex__SDL_QUIT ) ) )) { /* case */
+                   ^~
+                   =
+src/shmupwarz.c:3351:26: warning: equality comparison with extraneous parentheses [-Wparentheses-equality]
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_KEYDOWN ) ) )) { /* case */
+              ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:3351:26: note: remove extraneous parentheses around the comparison to silence this warning
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_KEYDOWN ) ) )) { /* case */
+            ~~           ^                                ~
+src/shmupwarz.c:3351:26: note: use '=' to turn this equality comparison into an assignment
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_KEYDOWN ) ) )) { /* case */
+                         ^~
+                         =
+src/shmupwarz.c:3353:24: warning: incompatible pointer types passing 'vex__Event *' (aka 'struct vex__Event *') to parameter of type 'SDL_Event *' (aka 'union SDL_Event *') [-Wincompatible-pointer-types]
+ key  =  KeyboardSym ( & /*vvar*/  event ) ;
+                       ^~~~~~~~~~~~~~~~~
+./include/vex/vex.h:25:42: note: passing argument to parameter 'kb' here
+static inline int KeyboardSym(SDL_Event* kb) {
+                                         ^
+src/shmupwarz.c:3365:26: warning: equality comparison with extraneous parentheses [-Wparentheses-equality]
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_KEYUP ) ) )) { /* case */
+              ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:3365:26: note: remove extraneous parentheses around the comparison to silence this warning
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_KEYUP ) ) )) { /* case */
+            ~~           ^                              ~
+src/shmupwarz.c:3365:26: note: use '=' to turn this equality comparison into an assignment
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_KEYUP ) ) )) { /* case */
+                         ^~
+                         =
+src/shmupwarz.c:3367:24: warning: incompatible pointer types passing 'vex__Event *' (aka 'struct vex__Event *') to parameter of type 'SDL_Event *' (aka 'union SDL_Event *') [-Wincompatible-pointer-types]
+ key  =  KeyboardSym ( & /*vvar*/  event ) ;
+                       ^~~~~~~~~~~~~~~~~
+./include/vex/vex.h:25:42: note: passing argument to parameter 'kb' here
+static inline int KeyboardSym(SDL_Event* kb) {
+                                         ^
+src/shmupwarz.c:3379:26: warning: equality comparison with extraneous parentheses [-Wparentheses-equality]
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_MOUSEMOTION ) ) )) { /* case */
+              ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:3379:26: note: remove extraneous parentheses around the comparison to silence this warning
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_MOUSEMOTION ) ) )) { /* case */
+            ~~           ^                                    ~
+src/shmupwarz.c:3379:26: note: use '=' to turn this equality comparison into an assignment
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_MOUSEMOTION ) ) )) { /* case */
+                         ^~
+                         =
+src/shmupwarz.c:3381:26: warning: incompatible pointer types passing 'vex__Event *' (aka 'struct vex__Event *') to parameter of type 'SDL_Event *' (aka 'union SDL_Event *') [-Wincompatible-pointer-types]
+ g ->mouseX  =  MouseX ( & /*vvar*/  event ) ;
+                         ^~~~~~~~~~~~~~~~~
+./include/vex/vex.h:34:37: note: passing argument to parameter 'mouse' here
+static inline int MouseX(SDL_Event* mouse) {
+                                    ^
+src/shmupwarz.c:3383:26: warning: incompatible pointer types passing 'vex__Event *' (aka 'struct vex__Event *') to parameter of type 'SDL_Event *' (aka 'union SDL_Event *') [-Wincompatible-pointer-types]
+ g ->mouseY  =  MouseY ( & /*vvar*/  event ) ;
+                         ^~~~~~~~~~~~~~~~~
+./include/vex/vex.h:38:37: note: passing argument to parameter 'mouse' here
+static inline int MouseY(SDL_Event* mouse) {
+                                    ^
+src/shmupwarz.c:3386:26: warning: equality comparison with extraneous parentheses [-Wparentheses-equality]
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_MOUSEBUTTONDOWN ) ) )) { /* case */
+              ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:3386:26: note: remove extraneous parentheses around the comparison to silence this warning
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_MOUSEBUTTONDOWN ) ) )) { /* case */
+            ~~           ^                                        ~
+src/shmupwarz.c:3386:26: note: use '=' to turn this equality comparison into an assignment
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_MOUSEBUTTONDOWN ) ) )) { /* case */
+                         ^~
+                         =
+src/shmupwarz.c:3390:27: warning: incompatible pointer types passing 'vex__Event *' (aka 'struct vex__Event *') to parameter of type 'SDL_Event *' (aka 'union SDL_Event *') [-Wincompatible-pointer-types]
+ g ->mouseX  =  ButtonX ( & /*vvar*/  event ) ;
+                          ^~~~~~~~~~~~~~~~~
+./include/vex/vex.h:42:38: note: passing argument to parameter 'button' here
+static inline int ButtonX(SDL_Event* button) {
+                                     ^
+src/shmupwarz.c:3392:27: warning: incompatible pointer types passing 'vex__Event *' (aka 'struct vex__Event *') to parameter of type 'SDL_Event *' (aka 'union SDL_Event *') [-Wincompatible-pointer-types]
+ g ->mouseY  =  ButtonY ( & /*vvar*/  event ) ;
+                          ^~~~~~~~~~~~~~~~~
+./include/vex/vex.h:46:38: note: passing argument to parameter 'button' here
+static inline int ButtonY(SDL_Event* button) {
+                                     ^
+src/shmupwarz.c:3395:26: warning: equality comparison with extraneous parentheses [-Wparentheses-equality]
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_MOUSEBUTTONUP ) ) )) { /* case */
+              ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:3395:26: note: remove extraneous parentheses around the comparison to silence this warning
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_MOUSEBUTTONUP ) ) )) { /* case */
+            ~~           ^                                      ~
+src/shmupwarz.c:3395:26: note: use '=' to turn this equality comparison into an assignment
+ else  if ( ( event .typ ==  ((u32)( vex__SDL_MOUSEBUTTONUP ) ) )) { /* case */
+                         ^~
+                         =
+src/shmupwarz.c:3399:27: warning: incompatible pointer types passing 'vex__Event *' (aka 'struct vex__Event *') to parameter of type 'SDL_Event *' (aka 'union SDL_Event *') [-Wincompatible-pointer-types]
+ g ->mouseX  =  ButtonX ( & /*vvar*/  event ) ;
+                          ^~~~~~~~~~~~~~~~~
+./include/vex/vex.h:42:38: note: passing argument to parameter 'button' here
+static inline int ButtonX(SDL_Event* button) {
+                                     ^
+src/shmupwarz.c:3401:27: warning: incompatible pointer types passing 'vex__Event *' (aka 'struct vex__Event *') to parameter of type 'SDL_Event *' (aka 'union SDL_Event *') [-Wincompatible-pointer-types]
+ g ->mouseY  =  ButtonY ( & /*vvar*/  event ) ;
+                          ^~~~~~~~~~~~~~~~~
+./include/vex/vex.h:46:38: note: passing argument to parameter 'button' here
+static inline int ButtonY(SDL_Event* button) {
+                                     ^
+src/shmupwarz.c:3487:17: warning: passing 'char [17]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ println ( tos2("Hello Sirius IV\n") ) ;
+                ^~~~~~~~~~~~~~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:3489:42: warning: passing 'char [12]' to parameter of type 'byte *' (aka 'unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+vex__Game* game= vex__create_game ( tos2("Hello World") , 640 , 480 ) ;
+                                         ^~~~~~~~~~~~~
+src/shmupwarz.c:771:20: note: passing argument to parameter 's' here
+ string tos2(byte* s) {
+                   ^
+src/shmupwarz.c:3545:11: warning: passing 'byte *' (aka 'unsigned char *') to parameter of type 'char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+        vsprintf(buf, fmt, argptr);
+                 ^~~
+/home/darkoverlordofdata/Documents/Projects/emsdk/fastcomp/emscripten/system/include/libc/stdio.h:109:30: note: passing argument to parameter here
+int vsprintf(char *__restrict, const char *__restrict, __isoc_va_list);
+                             ^
+src/shmupwarz.c:3560:11: warning: passing 'byteptr' (aka 'unsigned char *') to parameter of type 'char *' converts between pointers to integer types with different sign [-Wpointer-sign]
+        vsprintf(g_str_buf, fmt, argptr);
+                 ^~~~~~~~~
+/home/darkoverlordofdata/Documents/Projects/emsdk/fastcomp/emscripten/system/include/libc/stdio.h:109:30: note: passing argument to parameter here
+int vsprintf(char *__restrict, const char *__restrict, __isoc_va_list);
+                             ^
+83 warnings generated.

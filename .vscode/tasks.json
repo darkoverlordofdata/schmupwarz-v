@@ -1,0 +1,28 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "${workspaceFolder}/postbuild",
+            "args": [
+                "${workspaceFolder}",
+                "shmupwarz"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+
+            },
+            "dependsOn":["prebuild"]
+        },
+        {
+            "label": "prebuild",
+            "command": "v",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/shmupwarz.v"
+            ],
+            "group": "build",
+        }
+    ]
+}

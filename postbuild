@@ -1,0 +1,6 @@
+#!/bin/bash
+#
+# Copies the generated c to the local folder
+# injects the cmake shim
+#
+echo "#include <cmake-shim.h>$(cat ~/.vlang/$2.c)" > $1/src/$2.c

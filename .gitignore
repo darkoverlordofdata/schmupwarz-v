@@ -1,0 +1,7 @@
+.vscode/ipch
+include/glm
+shmupwarz
+emcc.log
+
+## Build generated
+build/

@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# Install custom modules vex and emscripten
+# into vlib & thirdparty
+#
+ln -s ~/Documents/GitHub/shmupwarz-v/vlib/vex ~/Documents/GitHub/v/vlib/vex
+ln -s ~/Documents/GitHub/shmupwarz-v/include/vex ~/Documents/GitHub/v/thirdparty/vex
+ln -s ~/Documents/GitHub/shmupwarz-v/vlib/emscripten ~/Documents/GitHub/v/vlib/emscripten
+ln -s ~/Documents/GitHub/shmupwarz-v/include/emscripten ~/Documents/GitHub/v/thirdparty/emscripten
+

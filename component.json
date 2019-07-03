@@ -1,0 +1,44 @@
+{
+  "!": "doran package manager v0.0.6",
+  "name": "shmupwarz",
+  "template": "c",
+  "version": "0.0.1",
+  "vala": "0.26",
+  "c": "11",
+  "cpp": "17",
+  "authors": ["darkoverlordofdata"],
+  "description": "shmupwarz",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {},
+  "source": "src",
+  "files": [
+    "src/shmupwarz.c",
+    "src/shmupwarz.v"
+  ],
+  "packages": null,
+  "includes": [
+    "./include",
+    "./include/vex",
+    "./include/emscripten",
+    "/usr/include/SDL2"
+  ],
+  "libraries": [
+    "m",
+    "dl",
+    "pthread",
+    "SDL2",
+    "SDL2_image",
+    "glew",
+    "GL"
+  ],
+  "options": {
+    "VERSION": "0.0.1",
+    "RELEASE_NAME": "shmupwarz"
+  },
+  "definitions": [],
+  "symbols": [],
+  "copy": null,
+  "vapidir": "/src/vapis",
+  "console": false
+}
