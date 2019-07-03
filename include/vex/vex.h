@@ -24,7 +24,11 @@ void vexInit() {
 /**
  * Decode the input events
  */
+int event_type(SDL_Event* event){
+    return event->type;
+}
 int KeyboardSym(SDL_Event* event){
+
     SDL_KeyboardEvent* e = (SDL_KeyboardEvent*)event;
     return e->keysym.sym;
 }

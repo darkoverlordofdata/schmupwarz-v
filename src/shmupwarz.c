@@ -70,7 +70,11 @@ void reload_so();
 void init_consts();
  int g_test_ok = 1; 
  /*================================== FNS =================================*/
-#include <string.h>
+#include "vex.h"
+#include "vex.h"
+#include "vex.h"
+#include "vex.h"
+#include "vex.h"
 #include "vex.h"
 #include <emscripten-shim.h>
 typedef struct array array;
@@ -85,10 +89,14 @@ typedef struct Entry Entry;
 typedef struct Option Option;
 typedef struct StringBuilder StringBuilder;
 typedef struct vex__Game vex__Game;
+typedef struct vex__Config vex__Config;
 typedef struct vex__Event vex__Event;
-typedef struct vex__KeyboardEvent vex__KeyboardEvent;
-typedef struct vex__MouseMotionEvent vex__MouseMotionEvent;
-typedef struct vex__MouseButtonEvent vex__MouseButtonEvent;
+typedef struct vex__Texture2D vex__Texture2D;
+typedef struct vex__Shader vex__Shader;
+typedef struct vex__ResourceManager vex__ResourceManager;
+typedef map map_Shader;
+typedef map map_Texture2D;
+typedef struct vex__SpriteRenderer vex__SpriteRenderer;
 struct /*kind*/ array {
 void* data;
 int len;
@@ -136,6 +144,14 @@ bool mouseDown;
 double delta;
 array_int keys;
 }; 
+struct /*kind*/ vex__Config {
+string title;
+int width;
+int height;
+int major;
+int minor;
+int images;
+}; 
 struct /*kind*/ vex__Event {
 u32 typ;
 u32 timestamp;
@@ -152,37 +168,28 @@ int pad8;
 int pad9;
 int pada;
 }; 
-struct /*kind*/ vex__KeyboardEvent {
-u32 typ;
-u32 timestamp;
-u32 windowID;
-byte state;
-byte repeat;
-int scancode;
-int sym;
-u16 mod;
+struct /*kind*/ vex__Texture2D {
+u32 id;
+u32 width;
+u32 height;
+u32 internal_format;
+u32 image_format;
+u32 wrap_s;
+u32 wrap_t;
+u32 filter_min;
+u32 filter_mag;
+string path;
 }; 
-struct /*kind*/ vex__MouseMotionEvent {
-u32 typ;
-u32 timestamp;
-u32 windowID;
-u32 which;
-u32 state;
-int x;
-int y;
-int xrel;
-int yrel;
+struct /*kind*/ vex__Shader {
+u32 id;
 }; 
-struct /*kind*/ vex__MouseButtonEvent {
-u32 typ;
-u32 timestamp;
-u32 windowID;
-u32 which;
-byte button;
-byte state;
-byte clicks;
-int x;
-int y;
+struct /*kind*/ vex__ResourceManager {
+map_Shader shaders;
+map_Texture2D textures;
+}; 
+struct /*kind*/ vex__SpriteRenderer {
+vex__Shader shader;
+u32 quad_vao;
 }; 
 
 string _STR(const char*, ...);
@@ -328,11 +335,18 @@ void StringBuilder_writeln(StringBuilder* b, string s);
 string StringBuilder_str(StringBuilder b);
 void StringBuilder_cut(StringBuilder b, int n);
 void v_StringBuilder_free(StringBuilder* b);
-vex__Game* vex__create_game(string title, int width, int height);
+vex__Game* vex__create_game(vex__Config cfg);
 void vex__Game_process_event(vex__Game* g);
 bool vex__Game_is_running(vex__Game* g);
+void vex__Game_update(vex__Game* g);
 void vex__Game_render(vex__Game* g);
 void vex__Game_terminate(vex__Game* g);
+vex__ResourceManager* vex__create_resource_manager();
+vex__Shader* vex__create_shader();
+vex__SpriteRenderer* vex__create_sprite_renderer();
+vex__Texture2D* vex__create_texture2d(string path);
+void vex__Texture2D_generate(vex__Texture2D* t, int width, int height, void* data);
+void vex__Texture2D_bind(vex__Texture2D* t);
 void emscripten__set_main_loop_arg(void* func, void* arg, int fps, int sim);
 bool emscripten__is_enabled();
 void main_loop(vex__Game* game);
@@ -356,6 +370,7 @@ int vex__SDL_GL_DOUBLEBUFFER;
 #define vex__SDL_GL_CONTEXT_MAJOR_VERSION  17
 #define vex__SDL_GL_CONTEXT_MINOR_VERSION  18
 int vex__IMG_INIT_PNG;
+#define vex__SDLK_ESCAPE  27
 int vex__GL_CULL_FACE;
 int vex__GL_BLEND;
 int vex__GL_SRC_ALPHA;
@@ -363,7 +378,17 @@ int vex__GL_ONE_MINUS_SRC_ALPHA;
 int vex__GL_COLOR_BUFFER_BIT;
 int vex__GL_DEPTH_BUFFER_BIT;
 int vex__GL_STENCIL_BUFFER_BIT;
-#define vex__SDLK_ESCAPE  27
+int vex__GL_TEXTURE_1D;
+int vex__GL_TEXTURE_2D;
+int vex__GL_TEXTURE_WRAP_S;
+int vex__GL_TEXTURE_WRAP_T;
+int vex__GL_TEXTURE_MAG_FILTER;
+int vex__GL_TEXTURE_MIN_FILTER;
+int vex__GL_RGB;
+int vex__GL_RGBA;
+int vex__GL_REPEAT;
+int vex__GL_LINEAR;
+int vex__GL_UNSIGNED_BYTE;
 
 
  array new_array(int mylen, int cap, int elm_size) {
@@ -3276,7 +3301,7 @@ _PUSH(& b ->buf , ( '\n' ), tmp1, byte) ;
  
  
  }
- vex__Game* vex__create_game(string title, int width, int height) {
+ vex__Game* vex__create_game(vex__Config cfg) {
  
  if ( SDL_Init ( vex__SDL_INIT_VIDEO | vex__SDL_INIT_EVENTS | vex__SDL_INIT_TIMER | vex__SDL_INIT_AUDIO ) ) {
  /*if*/
@@ -3289,15 +3314,15 @@ _PUSH(& b ->buf , ( '\n' ), tmp1, byte) ;
  }
  ;
  
- SDL_GL_SetAttribute ( vex__SDL_GL_CONTEXT_MAJOR_VERSION ,  3 ) ;
+ SDL_GL_SetAttribute ( vex__SDL_GL_CONTEXT_MAJOR_VERSION ,  cfg .major ) ;
  
- SDL_GL_SetAttribute ( vex__SDL_GL_CONTEXT_MINOR_VERSION ,  0 ) ;
+ SDL_GL_SetAttribute ( vex__SDL_GL_CONTEXT_MINOR_VERSION ,  cfg .minor ) ;
  
  SDL_GL_SetAttribute ( vex__SDL_GL_DOUBLEBUFFER ,  1 ) ;
  
  SDL_GL_SetAttribute ( vex__SDL_GL_DEPTH_SIZE ,  24 ) ;
  
- if ( IMG_Init ( vex__IMG_INIT_PNG ) != vex__IMG_INIT_PNG ) {
+ if ( IMG_Init ( cfg .images ) != cfg .images ) {
  /*if*/
  
  println ( tos2("Unable to Init image") ) ;
@@ -3305,7 +3330,7 @@ _PUSH(& b ->buf , ( '\n' ), tmp1, byte) ;
  }
  ;
  
-void* w= SDL_CreateWindow ( title .str ,  vex__SDL_WINDOWPOS_CENTERED ,  vex__SDL_WINDOWPOS_CENTERED ,  width ,  height ,  vex__SDL_WINDOW_OPENGL | vex__SDL_WINDOW_SHOWN ) ;
+void* w= SDL_CreateWindow ( cfg .title .str ,  vex__SDL_WINDOWPOS_CENTERED ,  vex__SDL_WINDOWPOS_CENTERED ,  cfg .width ,  cfg .height ,  vex__SDL_WINDOW_OPENGL | vex__SDL_WINDOW_SHOWN ) ;
  
 void* maincontext= SDL_GL_CreateContext ( w ) ;
  
@@ -3319,7 +3344,7 @@ void* maincontext= SDL_GL_CreateContext ( w ) ;
  
  vexInit ( ) ;
  
- glViewport ( 0 ,  0 ,  width ,  height ) ;
+ glViewport ( 0 ,  0 ,  cfg .width ,  cfg .height ) ;
  
  glEnable ( vex__GL_CULL_FACE ) ;
  
@@ -3328,7 +3353,7 @@ void* maincontext= SDL_GL_CreateContext ( w ) ;
  glBlendFunc ( vex__GL_SRC_ALPHA ,  vex__GL_ONE_MINUS_SRC_ALPHA ) ;
 int tmp3 =  0;
  
-vex__Game* g= ALLOC_INIT(vex__Game, { .window =  w , .title =  title , .running =  1 , .keys =  array_repeat(&tmp3,  256 , sizeof(int) ) , .width = 0 , .height = 0 , .x = 0 , .y = 0 , .mouseX = 0 , .mouseY = 0 , .mouseDown = 0 , } ) ;
+vex__Game* g= ALLOC_INIT(vex__Game, { .window =  w , .title =  cfg .title , .running =  1 , .keys =  array_repeat(&tmp3,  256 , sizeof(int) ) , .width = 0 , .height = 0 , .x = 0 , .y = 0 , .mouseX = 0 , .mouseY = 0 , .mouseDown = 0 , } ) ;
 
  
  return  g ;
@@ -3425,6 +3450,10 @@ array_set(&/*q*/ g ->keys , key , & tmp8) ;
  
  
  }
+ void vex__Game_update(vex__Game* g) {
+ 
+ 
+ }
  void vex__Game_render(vex__Game* g) {
  
  glClearColor ( 1.0 ,  0.0 ,  0.0 ,  1.0 ) ;
@@ -3442,6 +3471,84 @@ array_set(&/*q*/ g ->keys , key , & tmp8) ;
  IMG_Quit ( ) ;
  
  SDL_Quit ( ) ;
+ 
+ 
+ }
+ vex__ResourceManager* vex__create_resource_manager() {
+ 
+vex__ResourceManager* r= ALLOC_INIT(vex__ResourceManager, { } ) ;
+
+ 
+ return  r ;
+ 
+ 
+ }
+ vex__Shader* vex__create_shader() {
+ 
+vex__Shader* s= ALLOC_INIT(vex__Shader, { } ) ;
+
+ 
+ return  s ;
+ 
+ 
+ }
+ vex__SpriteRenderer* vex__create_sprite_renderer() {
+ 
+vex__SpriteRenderer* s= ALLOC_INIT(vex__SpriteRenderer, { } ) ;
+
+ 
+ return  s ;
+ 
+ 
+ }
+ vex__Texture2D* vex__create_texture2d(string path) {
+ 
+vex__Texture2D* t= ALLOC_INIT(vex__Texture2D, { .path =  path , } ) ;
+ 
+ glGenTextures ( 1 ,  & /*vvar*/  t ->id ) ;
+ 
+ t ->internal_format  =  ((u32)( vex__GL_RGB ) ) ;
+ 
+ t ->image_format  =  ((u32)( vex__GL_RGB ) ) ;
+ 
+ t ->wrap_s  =  ((u32)( vex__GL_REPEAT ) ) ;
+ 
+ t ->wrap_t  =  ((u32)( vex__GL_REPEAT ) ) ;
+ 
+ t ->filter_min  =  ((u32)( vex__GL_LINEAR ) ) ;
+ 
+ t ->filter_mag  =  ((u32)( vex__GL_LINEAR ) ) ;
+
+ 
+ return  t ;
+ 
+ 
+ }
+ void vex__Texture2D_generate(vex__Texture2D* t, int width, int height, void* data) {
+ 
+ t ->width  =  ((u32)( width ) ) ;
+ 
+ t ->height  =  ((u32)( height ) ) ;
+ 
+ glBindTexture ( vex__GL_TEXTURE_2D ,  t ->id ) ;
+ 
+ glTexImage2D ( vex__GL_TEXTURE_2D ,  0 ,  t ->internal_format ,  width ,  height ,  0 ,  t ->image_format ,  vex__GL_UNSIGNED_BYTE ,  data ) ;
+ 
+ glTexParameteri ( vex__GL_TEXTURE_2D ,  vex__GL_TEXTURE_WRAP_S ,  t ->wrap_s ) ;
+ 
+ glTexParameteri ( vex__GL_TEXTURE_2D ,  vex__GL_TEXTURE_WRAP_T ,  t ->wrap_t ) ;
+ 
+ glTexParameteri ( vex__GL_TEXTURE_2D ,  vex__GL_TEXTURE_MIN_FILTER ,  t ->filter_min ) ;
+ 
+ glTexParameteri ( vex__GL_TEXTURE_2D ,  vex__GL_TEXTURE_MAG_FILTER ,  t ->filter_mag ) ;
+ 
+ glBindTexture ( vex__GL_TEXTURE_2D ,  0 ) ;
+ 
+ 
+ }
+ void vex__Texture2D_bind(vex__Texture2D* t) {
+ 
+ glBindTexture ( vex__GL_TEXTURE_2D ,  t ->id ) ;
  
  
  }
@@ -3486,7 +3593,7 @@ bool res= 1 ;
  
  println ( tos2("Hello Sirius IV") ) ;
  
-vex__Game* game= vex__create_game ( tos2("Hello World") , 640 , 480 ) ;
+vex__Game* game= vex__create_game ( (vex__Config) { .title =  tos2("Shmupwarz") , .width =  640 , .height =  480 , .major =  3 , .minor =  0 , .images =  vex__IMG_INIT_PNG } ) ;
  
  if ( emscripten__is_enabled ( ) == 1 ) {
  /*if*/
@@ -3499,6 +3606,8 @@ vex__Game* game= vex__create_game ( tos2("Hello World") , 640 , 480 ) ;
  
  while ( vex__Game_is_running(& /* ? */* game ) ) {
  
+ vex__Game_update(& /* ? */* game ) ;
+ 
  vex__Game_render(& /* ? */* game ) ;
  
  }
@@ -3510,6 +3619,8 @@ vex__Game* game= vex__create_game ( tos2("Hello World") , 640 , 480 ) ;
  
  }
  void main_loop(vex__Game* game) {
+ 
+ vex__Game_update(& /* ? */* game ) ;
  
  vex__Game_render(& /* ? */* game ) ;
  
@@ -3533,7 +3644,18 @@ vex__GL_SRC_ALPHA =  0x0302;
 vex__GL_ONE_MINUS_SRC_ALPHA =  0x0303;
 vex__GL_COLOR_BUFFER_BIT =  0x00004000;
 vex__GL_DEPTH_BUFFER_BIT =  0x000000100;
-vex__GL_STENCIL_BUFFER_BIT =  0x000000400; }
+vex__GL_STENCIL_BUFFER_BIT =  0x000000400;
+vex__GL_TEXTURE_1D =  0x0de0;
+vex__GL_TEXTURE_2D =  0x0de1;
+vex__GL_TEXTURE_WRAP_S =  0x2802;
+vex__GL_TEXTURE_WRAP_T =  0x2803;
+vex__GL_TEXTURE_MAG_FILTER =  0x2800;
+vex__GL_TEXTURE_MIN_FILTER =  0x2801;
+vex__GL_RGB =  0x1907;
+vex__GL_RGBA =  0x1908;
+vex__GL_REPEAT =  0x2901;
+vex__GL_LINEAR =  0x2601;
+vex__GL_UNSIGNED_BYTE =  0x1401; }
  
 string _STR(const char *fmt, ...) {
 	va_list argptr;
