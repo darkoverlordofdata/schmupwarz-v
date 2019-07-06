@@ -94,6 +94,7 @@ typedef struct map map;
 typedef array array_Entry;
 typedef struct Entry Entry;
 typedef struct Option Option;
+typedef union vex__Event vex__Event;
 typedef struct vex__Config vex__Config;
 typedef struct vex__Game vex__Game;
 typedef struct vex__Vec2 vex__Vec2;
@@ -106,7 +107,6 @@ typedef array array_vex__Texture2D;
 typedef struct vex__Shader vex__Shader;
 typedef struct vex__SpriteRenderer vex__SpriteRenderer;
 typedef struct vex__Texture2D vex__Texture2D;
-typedef struct vex__Event vex__Event;
 typedef struct math__Fraction math__Fraction;
 typedef struct os__FILE os__FILE;
 typedef struct os__File os__File;
@@ -170,6 +170,10 @@ struct /*kind*/ Option {
 byte data  [255 ];
 string error;
 bool ok;
+}; 
+union /*kind*/ vex__Event {
+u32 _type;
+byte padding  [56 ];
 }; 
 struct /*kind*/ vex__Config {
 string title;
@@ -236,10 +240,6 @@ u32 wrap_t;
 u32 filter_min;
 u32 filter_mag;
 string path;
-}; 
-struct /*kind*/ vex__Event {
-u32 typ;
-byte padding  [52 ];
 }; 
 struct /*kind*/ math__Fraction {
 i64 n;
@@ -3697,12 +3697,12 @@ int key= 0 ;
  
  while ( SDL_PollEvent ( & /*vvar*/  event ) != 0 ) {
  
- if ( ( event .typ ==  ((u32)( vex__SDL_QUIT ) ) )) { /* case */
+ if ( ( event ._type ==  ((u32)( vex__SDL_QUIT ) ) )) { /* case */
  
  g ->running  =  0 ;
  
  }
- else  if ( ( event .typ ==  ((u32)( vex__SDL_KEYDOWN ) ) )) { /* case */
+ else  if ( ( event ._type ==  ((u32)( vex__SDL_KEYDOWN ) ) )) { /* case */
  
  key  =  KeyboardSym ( & /*vvar*/  event ) ;
  
@@ -3716,7 +3716,7 @@ array_set(&/*q*/ g ->keys , key , & tmp6) ;
  ;
  
  }
- else  if ( ( event .typ ==  ((u32)( vex__SDL_KEYUP ) ) )) { /* case */
+ else  if ( ( event ._type ==  ((u32)( vex__SDL_KEYUP ) ) )) { /* case */
  
  key  =  KeyboardSym ( & /*vvar*/  event ) ;
  
@@ -3730,14 +3730,14 @@ array_set(&/*q*/ g ->keys , key , & tmp7) ;
  ;
  
  }
- else  if ( ( event .typ ==  ((u32)( vex__SDL_MOUSEMOTION ) ) )) { /* case */
+ else  if ( ( event ._type ==  ((u32)( vex__SDL_MOUSEMOTION ) ) )) { /* case */
  
  g ->mouseX  =  MouseX ( & /*vvar*/  event ) ;
  
  g ->mouseY  =  MouseY ( & /*vvar*/  event ) ;
  
  }
- else  if ( ( event .typ ==  ((u32)( vex__SDL_MOUSEBUTTONDOWN ) ) )) { /* case */
+ else  if ( ( event ._type ==  ((u32)( vex__SDL_MOUSEBUTTONDOWN ) ) )) { /* case */
  
  g ->mouseDown  =  1 ;
  
@@ -3746,7 +3746,7 @@ array_set(&/*q*/ g ->keys , key , & tmp7) ;
  g ->mouseY  =  ButtonY ( & /*vvar*/  event ) ;
  
  }
- else  if ( ( event .typ ==  ((u32)( vex__SDL_MOUSEBUTTONUP ) ) )) { /* case */
+ else  if ( ( event ._type ==  ((u32)( vex__SDL_MOUSEBUTTONUP ) ) )) { /* case */
  
  g ->mouseDown  =  0 ;
  

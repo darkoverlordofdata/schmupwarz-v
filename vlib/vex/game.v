@@ -10,6 +10,12 @@ module vex
 
 #include "vex.h"
 
+union Event 
+{
+    _type u32
+    padding[56] byte
+}
+
 /**
  * Game Config
  */
@@ -91,7 +97,7 @@ pub fn (g mut Game) process_event()
     mut key := 0
 
     for C.SDL_PollEvent(&event) != 0 {  
-        switch event.typ {
+        switch event._type {
             case  u32(SDL_QUIT):
                 g.running = false
 

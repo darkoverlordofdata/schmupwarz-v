@@ -37,7 +37,9 @@
     "pthread",
     "SDL2",
     "SDL2_image",
-    "glew",
+    "SDL2_mixer",
+    "SDL2_ttf",
+    "GLEW",
     "GL"
   ],
   "options": {

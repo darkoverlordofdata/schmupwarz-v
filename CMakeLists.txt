@@ -28,10 +28,7 @@ endif ()
 #   application source
 #
 
-list ( APPEND C_SOURCES src/main.c )
-list ( APPEND C_SOURCES src/shmupwarz )
 list ( APPEND C_SOURCES src/shmupwarz.c )
-list ( APPEND C_SOURCES src/test )
 #
 #   application includes
 #
@@ -50,7 +47,9 @@ set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ldl" )
 set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lpthread" )
 set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lSDL2" )
 set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lSDL2_image" )
-set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lglew" )
+set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lSDL2_mixer" )
+set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lSDL2_ttf" )
+set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lGLEW" )
 set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lGL" )
 
 
@@ -67,7 +66,7 @@ include_directories(AFTER ${INCLUDES})
 #
 add_executable ( ${PROJECT_NAME} ${C_SOURCES} ${RESOURCES} )
 
-target_link_libraries ( ${PROJECT_NAME} m dl pthread SDL2 SDL2_image glew GL  )
+target_link_libraries ( ${PROJECT_NAME} m dl pthread SDL2 SDL2_image SDL2_mixer SDL2_ttf GLEW GL  )
 install (TARGETS ${PROJECT_NAME} RUNTIME DESTINATION . )
 
 include (CPack)

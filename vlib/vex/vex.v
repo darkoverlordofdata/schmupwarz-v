@@ -125,10 +125,10 @@ struct C.SDL_Surface
 /**
  *
  */
-struct Event 
-{
-pub:
-    typ u32
-    padding[52] byte
-}
+// struct Event 
+// {
+// pub:
+//     typ u32
+//     padding[52] byte
+// }
 
