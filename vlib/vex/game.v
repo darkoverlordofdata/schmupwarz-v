@@ -1,15 +1,30 @@
 module vex
 
 #flag linux -lSDL2
+#flag linux -lSDL2_ttf
+#flag linux -lSDL2_mixer
 #flag linux -lSDL2_image
 #flag linux -lGLEW
 #flag linux -lGL
-#flag linux  -I @VROOT/thirdparty/vex
+#flag linux -I @VROOT/thirdparty/vex
 
 #include "vex.h"
 
 /**
- *
+ * Game Config
+ */
+struct Config 
+{
+    title string
+    width int
+    height int
+    major int
+    minor int
+    images int
+}
+
+/**
+ * Game
  */
 struct Game {
 pub mut:
@@ -61,10 +76,10 @@ pub fn create_game(cfg Config) *Game
     C.glEnable(GL_BLEND)
     C.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-    mut g := &Game{ window: w, title: cfg.title, running: true, keys: [0; 256] }
-    // g.resource_manager = create_resource_manager()
+    return &Game{ window: w, title: cfg.title, running: true, keys: [0; 256],
+        resource_manager: create_resource_manager()}
 
-    return g
+    // return g
 }
 
 /**

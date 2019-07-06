@@ -94,6 +94,7 @@ typedef struct map map;
 typedef array array_Entry;
 typedef struct Entry Entry;
 typedef struct Option Option;
+typedef struct vex__Config vex__Config;
 typedef struct vex__Game vex__Game;
 typedef struct vex__Vec2 vex__Vec2;
 typedef struct vex__Vec3 vex__Vec3;
@@ -105,7 +106,6 @@ typedef array array_vex__Texture2D;
 typedef struct vex__Shader vex__Shader;
 typedef struct vex__SpriteRenderer vex__SpriteRenderer;
 typedef struct vex__Texture2D vex__Texture2D;
-typedef struct vex__Config vex__Config;
 typedef struct vex__Event vex__Event;
 typedef struct math__Fraction math__Fraction;
 typedef struct os__FILE os__FILE;
@@ -118,11 +118,28 @@ typedef Option Option_os__File;
 typedef Option Option_os__File;
 typedef struct os__filetime os__filetime;
 typedef struct os__win32finddata os__win32finddata;
+typedef int Actor ;
+
+typedef int Category ;
+
+typedef int Effect ;
+
+typedef struct Health Health;
+typedef struct Tween Tween;
+typedef struct Sprite Sprite;
+typedef struct Entity Entity;
+typedef struct Shmup Shmup;
 typedef array array_f32;
 typedef Option Option_string;
 typedef Option Option_os__File;
 typedef Option Option_os__File;
 typedef Option Option_os__File;
+typedef int Actor ;
+
+typedef int Category ;
+
+typedef int Effect ;
+
 struct /*kind*/ array {
 void* data;
 int len;
@@ -151,6 +168,14 @@ struct /*kind*/ Option {
 byte data  [255 ];
 string error;
 bool ok;
+}; 
+struct /*kind*/ vex__Config {
+string title;
+int width;
+int height;
+int major;
+int minor;
+int images;
 }; 
 struct /*kind*/ vex__Game {
 void* window;
@@ -210,29 +235,9 @@ u32 filter_min;
 u32 filter_mag;
 string path;
 }; 
-struct /*kind*/ vex__Config {
-string title;
-int width;
-int height;
-int major;
-int minor;
-int images;
-}; 
 struct /*kind*/ vex__Event {
 u32 typ;
-u32 timestamp;
-u32 windowID;
-int pad0;
-int pad1;
-int pad2;
-int pad3;
-int pad4;
-int pad5;
-int pad6;
-int pad7;
-int pad8;
-int pad9;
-int pada;
+byte padding  [52 ];
 }; 
 struct /*kind*/ math__Fraction {
 i64 n;
@@ -265,6 +270,42 @@ u16 cAlternateFileName  [14 ];
 u32 dwFileType;
 u32 dwCreatorType;
 u16 wFinderFlags;
+}; 
+struct /*kind*/ Health {
+int current;
+int maximum;
+}; 
+struct /*kind*/ Tween {
+f32 min;
+f32 max;
+f32 speed;
+bool repeat;
+bool active;
+}; 
+struct /*kind*/ Sprite {
+vex__Texture2D texture;
+int width;
+int height;
+}; 
+struct /*kind*/ Entity {
+int id;
+string name;
+bool active;
+Actor actor;
+Category category;
+vex__Vec2 position;
+SDL_Rect bounds;
+vex__Vec2 scale;
+Sprite sprite;
+Effect sound;
+vex__Vec3 tint;
+f32 expires;
+Health health;
+Tween tween;
+vex__Vec2 velocity;
+}; 
+struct /*kind*/ Shmup {
+vex__Game* game;
 }; 
 
 string _STR(const char*, ...);
@@ -422,8 +463,8 @@ vex__Vec3 vex__Vec3_add(vex__Vec3 a, vex__Vec3 b);
 vex__Vec3 vex__Vec3_sub(vex__Vec3 a, vex__Vec3 b);
 vex__Vec3 vex__Vec3_mult(vex__Vec3 a, vex__Vec3 b);
 vex__Vec3 vex__Vec3_mult_scalar(vex__Vec3 a, f32 b);
-vex__Mat4 vex__glm_identity();
 vex__Mat4 vex__glm_zero();
+vex__Mat4 vex__glm_identity();
 vex__Mat4 vex__glm_translate(vex__Mat4 m, vex__Vec3 v);
 f32 vex__glm_length(vex__Vec3 v);
 f32 vex__glm_dot(vex__Vec3 a, vex__Vec3 b);
@@ -552,7 +593,11 @@ array_string os__ls(string path);
 void os__signal(int signum, void* handler);
 void os__log(string s);
 void os__print_backtrace();
-void main_loop(vex__Game* game);
+Shmup* create_shmup();
+void Shmup_update(Shmup* s);
+void Shmup_render(Shmup* s);
+bool Shmup_is_running(Shmup* s);
+void Shmup_quit(Shmup* s);
 array_int g_ustring_runes; // global
 i64 total_m =  0; // global
 #define vex__SDL_WINDOWPOS_CENTERED  0
@@ -574,6 +619,8 @@ int vex__SDL_GL_DOUBLEBUFFER;
 #define vex__SDL_GL_CONTEXT_MINOR_VERSION  18
 int vex__IMG_INIT_PNG;
 #define vex__SDLK_ESCAPE  27
+#define vex__GL_FALSE  0
+#define vex__GL_TRUE  1
 int vex__GL_CULL_FACE;
 int vex__GL_BLEND;
 int vex__GL_SRC_ALPHA;
@@ -608,8 +655,6 @@ int vex__GL_2_BYTES;
 int vex__GL_3_BYTES;
 int vex__GL_4_BYTES;
 int vex__GL_DOUBLE;
-#define vex__GL_FALSE  0
-#define vex__GL_TRUE  1
 int vex__GL_TEXTURE0;
 int vex__GL_POINTS;
 int vex__GL_LINES;
@@ -701,6 +746,44 @@ int os__ENABLE_LVB_GRID_WORLDWIDE;
 array_string os__args;
 #define os__MAX_PATH  4096
 #define os__FILE_ATTRIBUTE_DIRECTORY  16
+#define _background 0 
+
+#define _lives 1 
+
+#define _enemy1 2 
+
+#define _enemy2 3 
+
+#define _enemy3 4 
+
+#define _player 5 
+
+#define _bullet 6 
+
+#define _explosion 7 
+
+#define _bang 8 
+
+#define _hud 9 
+
+#define _background 0 
+
+#define _bullet 1 
+
+#define _enemy 2 
+
+#define _explosion 3 
+
+#define _particle 4 
+
+#define _player 5 
+
+#define _pew 0 
+
+#define _smallasplode 1 
+
+#define _asplode 2 
+
 
 
  array new_array(int mylen, int cap, int elm_size) {
@@ -3587,18 +3670,16 @@ void* maincontext= SDL_GL_CreateContext ( w ) ;
  glEnable ( vex__GL_BLEND ) ;
  
  glBlendFunc ( vex__GL_SRC_ALPHA ,  vex__GL_ONE_MINUS_SRC_ALPHA ) ;
+
 int tmp3 =  0;
  
-vex__Game* g= ALLOC_INIT(vex__Game, { .window =  w , .title =  cfg .title , .running =  1 , .keys =  array_repeat(&tmp3,  256 , sizeof(int) ) , .width = 0 , .height = 0 , .x = 0 , .y = 0 , .mouseX = 0 , .mouseY = 0 , .mouseDown = 0 , .resource_manager = 0 , } ) ;
-
- 
- return  g ;
+ return  ALLOC_INIT(vex__Game, { .window =  w , .title =  cfg .title , .running =  1 , .keys =  array_repeat(&tmp3,  256 , sizeof(int) ) , .resource_manager =  vex__create_resource_manager ( ) , .width = 0 , .height = 0 , .x = 0 , .y = 0 , .mouseX = 0 , .mouseY = 0 , .mouseDown = 0 , } ) ;
  
  
  }
  void vex__Game_process_event(vex__Game* g) {
  
-vex__Event event= (vex__Event) { .pad0 = 0 , .pad1 = 0 , .pad2 = 0 , .pad3 = 0 , .pad4 = 0 , .pad5 = 0 , .pad6 = 0 , .pad7 = 0 , .pad8 = 0 , .pad9 = 0 , .pada = 0 } ;
+vex__Event event= (vex__Event) { } ;
  
 int key= 0 ;
  
@@ -3615,9 +3696,9 @@ int key= 0 ;
  
  if ( key >= 0  &&  key < 256 ) {
  /*if*/
-int tmp7 =  1;
+int tmp6 =  1;
  
-array_set(&/*q*/ g ->keys , key , & tmp7) ;
+array_set(&/*q*/ g ->keys , key , & tmp6) ;
  
  }
  ;
@@ -3629,9 +3710,9 @@ array_set(&/*q*/ g ->keys , key , & tmp7) ;
  
  if ( key >= 0  &&  key < 256 ) {
  /*if*/
-int tmp8 =  0;
+int tmp7 =  0;
  
-array_set(&/*q*/ g ->keys , key , & tmp8) ;
+array_set(&/*q*/ g ->keys , key , & tmp7) ;
  
  }
  ;
@@ -3843,6 +3924,15 @@ vex__Vec3 res= (vex__Vec3) { .x =  a .x * b , .y =  a .y * b , .z =  a .z * b } 
  
  
  }
+ vex__Mat4 vex__glm_zero() {
+ 
+f32* res= vex__f32_calloc ( sizeof( f32) * 16 ) ;
+
+ 
+ return  vex__mat4 ( res ) ;
+ 
+ 
+ }
  vex__Mat4 vex__glm_identity() {
  
 f32* res= vex__f32_calloc ( sizeof( f32) * 16 ) ;
@@ -3854,15 +3944,6 @@ f32* res= vex__f32_calloc ( sizeof( f32) * 16 ) ;
  res [/*ptr*/ 10 ]/*rf32 1*/  =  1 ;
  
  res [/*ptr*/ 15 ]/*rf32 1*/  =  1 ;
-
- 
- return  vex__mat4 ( res ) ;
- 
- 
- }
- vex__Mat4 vex__glm_zero() {
- 
-f32* res= vex__f32_calloc ( sizeof( f32) * 16 ) ;
 
  
  return  vex__mat4 ( res ) ;
@@ -4451,8 +4532,6 @@ vex__Mat4 model= vex__glm_identity ( ) ;
  model  =  vex__glm_scale ( model , vex__vec3 ( size .x , size .y , ((f32)( 1 ) ) ) ) ;
  
  vex__Shader_set_matrix(& /* ? */ s ->shader , tos2("model") , model , 1 ) ;
- 
- vex__Shader_set_float3(& /* ? */ s ->shader , tos2("spriteColor") , color .x , color .y , color .z , 1 ) ;
  
  vex__Shader_set_vector3(& /* ? */ s ->shader , tos2("spriteColor") , color , 1 ) ;
  
@@ -6038,38 +6117,50 @@ _PUSH(& res , ( name ), tmp74, string) ;
  
  println ( tos2("Hello Sirius IV") ) ;
  
-vex__Game* game= vex__create_game ( (vex__Config) { .title =  tos2("Shmupwarz") , .width =  640 , .height =  480 , .major =  3 , .minor =  0 , .images =  vex__IMG_INIT_PNG } ) ;
+Shmup* shmup= create_shmup ( ) ;
  
- if ( emscripten__is_enabled ( ) == 1 ) {
- /*if*/
+ while ( Shmup_is_running( shmup ) ) {
  
- emscripten__set_main_loop_arg ( main_loop , game , 60 , 0 ) ;
+ Shmup_update( shmup ) ;
  
- }
-  else { 
- /*else if*/
- 
- while ( vex__Game_is_running( game ) ) {
- 
- vex__Game_update( game ) ;
- 
- vex__Game_render( game ) ;
+ Shmup_render( shmup ) ;
  
  }
  ;
  
- vex__Game_quit( game ) ;
- 
- }
- ;
+ Shmup_quit( shmup ) ;
  
  
  }
- void main_loop(vex__Game* game) {
+ Shmup* create_shmup() {
+
  
- vex__Game_update( game ) ;
+ return  ALLOC_INIT(Shmup, { .game =  vex__create_game ( (vex__Config) { .title =  tos2("Shmupwarz") , .width =  640 , .height =  480 , .major =  3 , .minor =  0 , .images =  vex__IMG_INIT_PNG } ) } ) ;
  
- vex__Game_render( game ) ;
+ 
+ }
+ void Shmup_update(Shmup* s) {
+ 
+ vex__Game_update( s ->game ) ;
+ 
+ 
+ }
+ void Shmup_render(Shmup* s) {
+ 
+ vex__Game_render( s ->game ) ;
+ 
+ 
+ }
+ bool Shmup_is_running(Shmup* s) {
+
+ 
+ return  vex__Game_is_running( s ->game ) ;
+ 
+ 
+ }
+ void Shmup_quit(Shmup* s) {
+ 
+ vex__Game_quit( s ->game ) ;
  
  
  }

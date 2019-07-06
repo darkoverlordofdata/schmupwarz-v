@@ -75,7 +75,7 @@ pub fn (m Mat4) str() string {
 }
 
 
-fn (a Vec3) add(b Vec3) Vec3 {
+pub fn (a Vec3) add(b Vec3) Vec3 {
 	res := Vec3 {
 		x: a.x + b.x,
 		y: a.y + b.y,
@@ -84,7 +84,7 @@ fn (a Vec3) add(b Vec3) Vec3 {
 	return res
 }
 
-fn (a Vec3) sub(b Vec3) Vec3 {
+pub fn (a Vec3) sub(b Vec3) Vec3 {
 	res := Vec3 {
 		x: a.x - b.x,
 		y: a.y - b.y,
@@ -93,11 +93,11 @@ fn (a Vec3) sub(b Vec3) Vec3 {
 	return res
 }
 
-fn (a Vec3) mult(b Vec3) Vec3 {
+pub fn (a Vec3) mult(b Vec3) Vec3 {
 	return vec3(a.x * b.x, a.y * b.y, a.z * b.z)
 }
 
-fn (a Vec3) mult_scalar(b f32) Vec3 {
+pub fn (a Vec3) mult_scalar(b f32) Vec3 {
 	res := Vec3 {
 		x: a.x * b,
 		y: a.y * b,

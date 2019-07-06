@@ -1,10 +1,12 @@
 module vex
 
 #flag linux -lSDL2
+#flag linux -lSDL2_ttf
+#flag linux -lSDL2_mixer
 #flag linux -lSDL2_image
 #flag linux -lGLEW
 #flag linux -lGL
-#flag linux  -I @VROOT/thirdparty/vex
+#flag linux -I @VROOT/thirdparty/vex
 
 #include "vex.h"
 

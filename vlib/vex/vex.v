@@ -7,37 +7,17 @@
 module vex
 
 #flag linux -lSDL2
+#flag linux -lSDL2_ttf
+#flag linux -lSDL2_mixer
 #flag linux -lSDL2_image
 #flag linux -lGLEW
 #flag linux -lGL
-#flag linux  -I @VROOT/thirdparty/vex
+#flag linux -I @VROOT/thirdparty/vex
 
 #include "vex.h"
 
-struct C.SDL_Rect {
-    x int
-    y int
-    w int
-    h int
-}
-struct C.SDL_Surface {
-    flags u32
-    format voidptr
-    w int
-    h int
-    pitch int
-    pixels voidptr
-    userdata voidptr
-    locked int
-    lock_data voidptr
-    clip_rect C.SDL_Rect
-    map voidptr
-    refcount int
-}
-
-
 /**
- *
+ * SDL2 constants
  */
 const (
     SDL_WINDOWPOS_CENTERED = 0
@@ -62,9 +42,11 @@ const (
 )
 
 /**
- *
+ * OpenGL constants
  */
 const (
+    GL_FALSE =				             0
+    GL_TRUE =					         1
     GL_CULL_FACE =                  0x0b44
     GL_BLEND =                      0x0be2
     GL_SRC_ALPHA =                  0x0302
@@ -99,8 +81,6 @@ const (
     GL_3_BYTES =				    0x1408
     GL_4_BYTES =				    0x1409
     GL_DOUBLE =				        0x140a
-    GL_FALSE =				            0
-    GL_TRUE =					        1
     GL_TEXTURE0	=			        0xb4c0
     GL_POINTS =				        0x0000
     GL_LINES =				        0x0001
@@ -116,39 +96,39 @@ const (
 
 )
 
-
-/**
- *
- */
-struct Config 
+struct C.SDL_Rect 
 {
-    title string
-    width int
-    height int
-    major int
-    minor int
-    images int
+    x int
+    y int
+    w int
+    h int
+}
+
+struct C.SDL_Surface 
+{
+    flags u32
+    format voidptr
+    w int
+    h int
+    pitch int
+    pixels voidptr
+    userdata voidptr
+    locked int
+    lock_data voidptr
+    clip_rect C.SDL_Rect
+    map voidptr
+    refcount int
 }
 
 
+
 /**
  *
  */
-struct Event {
+struct Event 
+{
 pub:
     typ u32
-    timestamp u32
-    windowID u32
-    pad0 int
-    pad1 int
-    pad2 int
-    pad3 int
-    pad4 int
-    pad5 int
-    pad6 int
-    pad7 int
-    pad8 int
-    pad9 int
-    pada int
+    padding[52] byte
 }
 
