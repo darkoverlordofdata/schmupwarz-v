@@ -47,6 +47,8 @@ typedef array array_int;
 typedef array array_byte; 
 typedef array array_uint; 
 typedef array array_float; 
+typedef array array_f32; 
+typedef array array_f64; 
 typedef map map_int; 
 typedef map map_string; 
 #ifndef bool
@@ -58,6 +60,7 @@ typedef map map_string;
 //============================== HELPER C MACROS =============================*/ 
 
 #define _PUSH(arr, val, tmp, tmp_typ) {tmp_typ tmp = (val); array__push(arr, &tmp);}
+#define _PUSH_MANY(arr, val, tmp, tmp_typ) {tmp_typ tmp = (val); array__push_many(arr, tmp.data, tmp.len);}
 #define _IN(typ, val, arr) array_##typ##_contains(arr, val) 
 #define ALLOC_INIT(type, ...) (type *)memdup((type[]){ __VA_ARGS__ }, sizeof(type)) 
 #define UTF8_CHAR_LEN( byte ) (( 0xE5000000 >> (( byte >> 3 ) & 0x1e )) & 3 ) + 1 
@@ -77,6 +80,10 @@ void init_consts();
 #include "vex.h"
 #include "vex.h"
 #include <emscripten-shim.h>
+#include <sys/stat.h>
+#include <signal.h>
+#include <errno.h>
+#include <dirent.h>
 typedef struct array array;
 typedef array array_int;
 typedef array array_string;
@@ -87,16 +94,35 @@ typedef struct map map;
 typedef array array_Entry;
 typedef struct Entry Entry;
 typedef struct Option Option;
-typedef struct StringBuilder StringBuilder;
 typedef struct vex__Game vex__Game;
+typedef struct vex__Vec2 vex__Vec2;
+typedef struct vex__Vec3 vex__Vec3;
+typedef struct vex__Vec4 vex__Vec4;
+typedef struct vex__Mat4 vex__Mat4;
+typedef struct vex__ResourceManager vex__ResourceManager;
+typedef array array_vex__Shader;
+typedef array array_vex__Texture2D;
+typedef struct vex__Shader vex__Shader;
+typedef struct vex__SpriteRenderer vex__SpriteRenderer;
+typedef struct vex__Texture2D vex__Texture2D;
 typedef struct vex__Config vex__Config;
 typedef struct vex__Event vex__Event;
-typedef struct vex__Texture2D vex__Texture2D;
-typedef struct vex__Shader vex__Shader;
-typedef struct vex__ResourceManager vex__ResourceManager;
-typedef map map_Shader;
-typedef map map_Texture2D;
-typedef struct vex__SpriteRenderer vex__SpriteRenderer;
+typedef struct math__Fraction math__Fraction;
+typedef struct os__FILE os__FILE;
+typedef struct os__File os__File;
+typedef struct os__FileInfo os__FileInfo;
+typedef Option Option_string;
+typedef array array_ustring;
+typedef Option Option_os__File;
+typedef Option Option_os__File;
+typedef Option Option_os__File;
+typedef struct os__filetime os__filetime;
+typedef struct os__win32finddata os__win32finddata;
+typedef array array_f32;
+typedef Option Option_string;
+typedef Option Option_os__File;
+typedef Option Option_os__File;
+typedef Option Option_os__File;
 struct /*kind*/ array {
 void* data;
 int len;
@@ -122,13 +148,9 @@ string key;
 void* val;
 }; 
 struct /*kind*/ Option {
-void* data;
+byte data  [255 ];
 string error;
 bool ok;
-}; 
-struct /*kind*/ StringBuilder {
-array_byte buf;
-int len;
 }; 
 struct /*kind*/ vex__Game {
 void* window;
@@ -142,7 +164,51 @@ int mouseX;
 int mouseY;
 bool mouseDown;
 double delta;
+vex__ResourceManager* resource_manager;
 array_int keys;
+}; 
+struct /*kind*/ vex__Vec2 {
+f32 x;
+f32 y;
+}; 
+struct /*kind*/ vex__Vec3 {
+f32 x;
+f32 y;
+f32 z;
+}; 
+struct /*kind*/ vex__Vec4 {
+f32 x;
+f32 y;
+f32 z;
+f32 w;
+}; 
+struct /*kind*/ vex__Mat4 {
+f32* data;
+}; 
+struct /*kind*/ vex__ResourceManager {
+map_int shader_index;
+array_vex__Shader shader_data;
+map_int texture_index;
+array_vex__Texture2D texture_data;
+}; 
+struct /*kind*/ vex__Shader {
+u32 id;
+}; 
+struct /*kind*/ vex__SpriteRenderer {
+vex__Shader shader;
+u32 vao;
+}; 
+struct /*kind*/ vex__Texture2D {
+u32 id;
+u32 width;
+u32 height;
+u32 internal_format;
+u32 image_format;
+u32 wrap_s;
+u32 wrap_t;
+u32 filter_min;
+u32 filter_mag;
+string path;
 }; 
 struct /*kind*/ vex__Config {
 string title;
@@ -168,28 +234,37 @@ int pad8;
 int pad9;
 int pada;
 }; 
-struct /*kind*/ vex__Texture2D {
-u32 id;
-u32 width;
-u32 height;
-u32 internal_format;
-u32 image_format;
-u32 wrap_s;
-u32 wrap_t;
-u32 filter_min;
-u32 filter_mag;
-string path;
+struct /*kind*/ math__Fraction {
+i64 n;
+i64 d;
 }; 
-struct /*kind*/ vex__Shader {
-u32 id;
+struct /*kind*/ os__FILE {
 }; 
-struct /*kind*/ vex__ResourceManager {
-map_Shader shaders;
-map_Texture2D textures;
+struct /*kind*/ os__File {
+os__FILE* cfile;
 }; 
-struct /*kind*/ vex__SpriteRenderer {
-vex__Shader shader;
-u32 quad_vao;
+struct /*kind*/ os__FileInfo {
+string name;
+int size;
+}; 
+struct /*kind*/ os__filetime {
+u32 dwLowDateTime;
+u32 dwHighDateTime;
+}; 
+struct /*kind*/ os__win32finddata {
+u32 dwFileAttributes;
+os__filetime ftCreationTime;
+os__filetime ftLastAccessTime;
+os__filetime ftLastWriteTime;
+u32 nFileSizeHigh;
+u32 nFileSizeLow;
+u32 dwReserved0;
+u32 dwReserved1;
+u16 cFileName  [260 ];
+u16 cAlternateFileName  [14 ];
+u32 dwFileType;
+u32 dwCreatorType;
+u16 wFinderFlags;
 }; 
 
 string _STR(const char*, ...);
@@ -198,10 +273,10 @@ string _STR(const char*, ...);
 string _STR_TMP(const char*, ...);
 
 array new_array(int mylen, int cap, int elm_size);
+array _make(int len, int cap, int elm_size);
 array new_array_from_c_array(int len, int cap, int elm_size, void* c_array);
 array new_array_from_c_array_no_alloc(int len, int cap, int elm_size, void* c_array);
 array array_repeat(void* val, int nr_repeats, int elm_size);
-void array_append_array(array* a, array b);
 void array_sort_with_compare(array* a, void* compare);
 void array_insert(array* a, int i, void* val);
 void array_prepend(array* a, void* val);
@@ -284,7 +359,6 @@ string array_string_join_lines(array_string s);
 string string_reverse(string s);
 string string_limit(string s, int max);
 bool byte_is_white(byte c);
-string repeat_char(byte c, int n);
 int string_hash(string s);
 void v_exit(int code);
 bool isnil(void* v);
@@ -297,9 +371,7 @@ void v_print(string s);
 byte* v_malloc(int n);
 byte* v_calloc(int n);
 int _strlen(byte* s);
-Option opt_ok(void* data);
 void* memdup(void* src, int sz);
-Option v_error(string s);
 string double_str(double d);
 string f64_str(f64 d);
 string f32_str(f32 d);
@@ -329,26 +401,157 @@ bool map_exists(map m, string key);
 void v_map_print(map m);
 void v_map_free(map m);
 string map_string_str(map_string m);
-StringBuilder new_string_builder(int initial_size);
-void StringBuilder_write(StringBuilder* b, string s);
-void StringBuilder_writeln(StringBuilder* b, string s);
-string StringBuilder_str(StringBuilder b);
-void StringBuilder_cut(StringBuilder b, int n);
-void v_StringBuilder_free(StringBuilder* b);
+Option opt_ok(void* data, int size);
+Option v_error(string s);
 vex__Game* vex__create_game(vex__Config cfg);
 void vex__Game_process_event(vex__Game* g);
 bool vex__Game_is_running(vex__Game* g);
 void vex__Game_update(vex__Game* g);
 void vex__Game_render(vex__Game* g);
-void vex__Game_terminate(vex__Game* g);
+void vex__Game_quit(vex__Game* g);
+f32* vex__f32_calloc(int n);
+vex__Vec2 vex__vec2(f32 x, f32 y);
+vex__Vec3 vex__vec3(f32 x, f32 y, f32 z);
+vex__Vec4 vex__vec4(f32 x, f32 y, f32 z, f32 w);
+vex__Mat4 vex__mat4(f32* f);
+string vex__Vec2_str(vex__Vec2 v);
+string vex__Vec3_str(vex__Vec3 v);
+string vex__Vec4_str(vex__Vec4 v);
+string vex__Mat4_str(vex__Mat4 m);
+vex__Vec3 vex__Vec3_add(vex__Vec3 a, vex__Vec3 b);
+vex__Vec3 vex__Vec3_sub(vex__Vec3 a, vex__Vec3 b);
+vex__Vec3 vex__Vec3_mult(vex__Vec3 a, vex__Vec3 b);
+vex__Vec3 vex__Vec3_mult_scalar(vex__Vec3 a, f32 b);
+vex__Mat4 vex__glm_identity();
+vex__Mat4 vex__glm_zero();
+vex__Mat4 vex__glm_translate(vex__Mat4 m, vex__Vec3 v);
+f32 vex__glm_length(vex__Vec3 v);
+f32 vex__glm_dot(vex__Vec3 a, vex__Vec3 b);
+f32 vex__glm_norm2(vex__Vec3 v);
+f32 vex__glm_norm(vex__Vec3 v);
+vex__Vec3 vex__glm_normalize(vex__Vec3 v);
+vex__Mat4 vex__glm_scale(vex__Mat4 m, vex__Vec3 v);
+vex__Mat4 vex__glm_ortho(f32 left, f32 right, f32 bottom, f32 top, f32 nearVal, f32 farVal);
+vex__Mat4 vex__glm_perspective(f32 fov, f32 aspect, f32 zNear, f32 zFar);
+vex__Mat4 vex__glm_rotate(vex__Mat4 m, f32 angle, vex__Vec3 v);
 vex__ResourceManager* vex__create_resource_manager();
-vex__Shader* vex__create_shader();
-vex__SpriteRenderer* vex__create_sprite_renderer();
-vex__Texture2D* vex__create_texture2d(string path);
+vex__Shader* vex__ResourceManager_load_shader(vex__ResourceManager* r, string vertex_file, string fragment_file, string name);
+vex__Shader* vex__ResourceManager_get_shader(vex__ResourceManager* r, string name);
+string vex__read_shader_file(string path);
+void vex__ResourceManager_load_shader_from_file(vex__ResourceManager* r, string vertex_file, string fragment_file, vex__Shader* shader);
+vex__Texture2D* vex__ResourceManager_load_texture(vex__ResourceManager* r, string path, bool alpha, string name);
+vex__Texture2D* vex__ResourceManager_get_texture(vex__ResourceManager* r, string name);
+void vex__ResourceManager_load_texture_from_file(vex__ResourceManager* r, string path, bool alpha, vex__Texture2D* texture);
+vex__Shader* vex__Shader_use(vex__Shader* s);
+void vex__Shader_check_compile_errors(vex__Shader* s, u32 object, string typ);
+void vex__Shader_compile(vex__Shader* s, string vertex_source, string fragment_source);
+void vex__Shader_set_float(vex__Shader* s, string name, f32 value, bool use_shader);
+void vex__Shader_set_integer(vex__Shader* s, string name, int value, bool use_shader);
+void vex__Shader_set_float2(vex__Shader* s, string name, f32 x, f32 y, bool use_shader);
+void vex__Shader_set_float3(vex__Shader* s, string name, f32 x, f32 y, f32 z, bool use_shader);
+void vex__Shader_set_vector3(vex__Shader* s, string name, vex__Vec3 v, bool use_shader);
+void vex__Shader_set_float4(vex__Shader* s, string name, f32 x, f32 y, f32 z, f32 w, bool use_shader);
+void vex__Shader_set_matrix(vex__Shader* s, string name, vex__Mat4 mat, bool use_shader);
+vex__SpriteRenderer* vex__create_sprite_renderer(vex__Shader* shader);
+void vex__SpriteRenderer_draw_sprite(vex__SpriteRenderer* s, vex__Texture2D* texture, vex__Vec2 position, vex__Vec2 size, f32 rotate, vex__Vec3 color);
+void vex__SpriteRenderer_init_render_data(vex__SpriteRenderer* s);
+void vex__Texture2D_init(vex__Texture2D* t, string path);
 void vex__Texture2D_generate(vex__Texture2D* t, int width, int height, void* data);
 void vex__Texture2D_bind(vex__Texture2D* t);
 void emscripten__set_main_loop_arg(void* func, void* arg, int fps, int sim);
 bool emscripten__is_enabled();
+math__Fraction math__fraction(i64 n, i64 d);
+string math__Fraction_str(math__Fraction f);
+math__Fraction math__Fraction_plus(math__Fraction f1, math__Fraction f2);
+math__Fraction math__Fraction_minus(math__Fraction f1, math__Fraction f2);
+math__Fraction math__Fraction_add(math__Fraction f1, math__Fraction f2);
+math__Fraction math__Fraction_subtract(math__Fraction f1, math__Fraction f2);
+math__Fraction math__Fraction_multiply(math__Fraction f1, math__Fraction f2);
+math__Fraction math__Fraction_divide(math__Fraction f1, math__Fraction f2);
+math__Fraction math__Fraction_reciprocal(math__Fraction f1);
+i64 math__Fraction_gcd(math__Fraction f1);
+math__Fraction math__Fraction_reduce(math__Fraction f1);
+f64 math__Fraction_f64(math__Fraction f1);
+bool math__Fraction_equals(math__Fraction f1, math__Fraction f2);
+f64 math__abs(f64 a);
+f64 math__acos(f64 a);
+f64 math__asin(f64 a);
+f64 math__atan(f64 a);
+f64 math__atan2(f64 a, f64 b);
+f64 math__cbrt(f64 a);
+f64 math__ceil(f64 a);
+f64 math__cos(f64 a);
+f64 math__cosh(f64 a);
+f64 math__exp(f64 a);
+array_int math__digits(int n, int base);
+f64 math__exp2(f64 a);
+f64 math__floor(f64 a);
+f64 math__fmod(f64 a, f64 b);
+i64 math__gcd(i64 a, i64 b);
+i64 math__lcm(i64 a, i64 b);
+f64 math__log(f64 a);
+f64 math__log2(f64 a);
+f64 math__log10(f64 a);
+f64 math__log_n(f64 a, f64 b);
+f64 math__max(f64 a, f64 b);
+f64 math__min(f64 a, f64 b);
+f64 math__pow(f64 a, f64 b);
+f64 math__radians(f64 degrees);
+f64 math__degrees(f64 radians);
+f64 math__round(f64 f);
+f64 math__sin(f64 a);
+f64 math__sinh(f64 a);
+f64 math__sqrt(f64 a);
+f64 math__tan(f64 a);
+f64 math__tanh(f64 a);
+f64 math__trunc(f64 a);
+i64 math__factorial(int a);
+void os__todo_remove();
+array_string os__init_os_args(int argc, byteptr* argv);
+array_string os__parse_windows_cmd_line(byte* cmd);
+Option_string os__read_file(string path);
+int os__file_size(string path);
+void os__mv(string old, string new);
+array_string os__read_lines(string path);
+array_ustring os__read_ulines(string path);
+Option_os__File os__open(string path);
+Option_os__File os__create(string path);
+Option_os__File os__open_append(string path);
+void os__File_write(os__File f, string s);
+void os__File_write_bytes(os__File f, void* data, int size);
+void os__File_write_bytes_at(os__File f, void* data, int size, int pos);
+void os__File_writeln(os__File f, string s);
+void os__File_close(os__File f);
+int os__system(string cmd);
+os__FILE* os__popen(string path);
+string os__exec(string cmd);
+string os__getenv(string key);
+int os__setenv(string name, string value, bool overwrite);
+int os__unsetenv(string name);
+bool os__file_exists(string path);
+bool os__dir_exists(string path);
+void os__mkdir(string path);
+void os__rm(string path);
+void os__print_c_errno();
+string os__ext(string path);
+string os__path_sans_ext(string path);
+string os__basedir(string path);
+string os__filename(string path);
+string os__get_line();
+string os__get_raw_line();
+string os__user_os();
+string os__home_dir();
+void os__write_file(string path, string text);
+void os__clear();
+void os__on_segfault(void* f);
+string os__getexepath();
+bool os__is_dir(string path);
+void os__chdir(string path);
+string os__getwd();
+array_string os__ls(string path);
+void os__signal(int signum, void* handler);
+void os__log(string s);
+void os__print_backtrace();
 void main_loop(vex__Game* game);
 array_int g_ustring_runes; // global
 i64 total_m =  0; // global
@@ -388,7 +591,116 @@ int vex__GL_RGB;
 int vex__GL_RGBA;
 int vex__GL_REPEAT;
 int vex__GL_LINEAR;
+int vex__GL_VERTEX_SHADER;
+int vex__GL_FRAGMENT_SHADER;
+int vex__GL_COMPILE_STATUS;
+int vex__GL_LINK_STATUS;
+int vex__GL_ARRAY_BUFFER;
+int vex__GL_STATIC_DRAW;
+int vex__GL_BYTE;
 int vex__GL_UNSIGNED_BYTE;
+int vex__GL_SHORT;
+int vex__GL_UNSIGNED_SHORT;
+int vex__GL_INT;
+int vex__GL_UNSIGNED_INT;
+int vex__GL_FLOAT;
+int vex__GL_2_BYTES;
+int vex__GL_3_BYTES;
+int vex__GL_4_BYTES;
+int vex__GL_DOUBLE;
+#define vex__GL_FALSE  0
+#define vex__GL_TRUE  1
+int vex__GL_TEXTURE0;
+int vex__GL_POINTS;
+int vex__GL_LINES;
+int vex__GL_LINE_LOOP;
+int vex__GL_LINE_STRIP;
+int vex__GL_TRIANGLES;
+int vex__GL_TRIANGLE_STRIP;
+int vex__GL_TRIANGLE_FAN;
+int vex__GL_QUADS;
+int vex__GL_QUAD_STRIP;
+int vex__GL_POLYGON;
+#define math__E  2.71828182845904523536028747135266249775724709369995957496696763
+#define math__Pi  3.14159265358979323846264338327950288419716939937510582097494459
+#define math__Phi  1.61803398874989484820458683436563811772030917980576286213544862
+#define math__Tau  6.28318530717958647692528676655900576839433879875021164194988918
+#define math__Sqrt2  1.41421356237309504880168872420969807856967187537694807317667974
+#define math__SqrtE  1.64872127070012814684865078781416357165377610071014801157507931
+#define math__SqrtPi  1.77245385090551602729816748334114518279754945612238712821380779
+#define math__SqrtTau  2.50662827463100050241576528481104525300698674060993831662992357
+#define math__SqrtPhi  1.27201964951406896425242246173749149171560804184009624861664038
+#define math__Ln2  0.693147180559945309417232121458176568075500134360255254120680009
+f32 math__Log2E;
+#define math__Ln10  2.30258509299404568401799145468436420760110148862877297603332790
+f32 math__Log10E;
+#define os__FILE_SHARE_READ  1
+#define os__FILE_SHARE_WRITE  2
+#define os__FILE_SHARE_DELETE  4
+#define os__FILE_NOTIFY_CHANGE_FILE_NAME  1
+#define os__FILE_NOTIFY_CHANGE_DIR_NAME  2
+#define os__FILE_NOTIFY_CHANGE_ATTRIBUTES  4
+#define os__FILE_NOTIFY_CHANGE_SIZE  8
+#define os__FILE_NOTIFY_CHANGE_LAST_WRITE  16
+#define os__FILE_NOTIFY_CHANGE_LAST_ACCESS  32
+#define os__FILE_NOTIFY_CHANGE_CREATION  64
+#define os__FILE_NOTIFY_CHANGE_SECURITY  128
+#define os__FILE_ACTION_ADDED  1
+#define os__FILE_ACTION_REMOVED  2
+#define os__FILE_ACTION_MODIFIED  3
+#define os__FILE_ACTION_RENAMED_OLD_NAME  4
+#define os__FILE_ACTION_RENAMED_NEW_NAME  5
+int os__FILE_ATTR_READONLY;
+int os__FILE_ATTR_HIDDEN;
+int os__FILE_ATTR_SYSTEM;
+int os__FILE_ATTR_DIRECTORY;
+int os__FILE_ATTR_ARCHIVE;
+int os__FILE_ATTR_DEVICE;
+int os__FILE_ATTR_NORMAL;
+int os__FILE_ATTR_TEMPORARY;
+int os__FILE_ATTR_SPARSE_FILE;
+int os__FILE_ATTR_REPARSE_POINT;
+int os__FILE_ATTR_COMPRESSED;
+int os__FILE_ATTR_OFFLINE;
+int os__FILE_ATTR_NOT_CONTENT_INDEXED;
+int os__FILE_ATTR_ENCRYPTED;
+int os__FILE_ATTR_INTEGRITY_STREAM;
+int os__FILE_ATTR_VIRTUAL;
+int os__FILE_ATTR_NO_SCRUB_DATA;
+int os__FILE_TYPE_DISK;
+int os__FILE_TYPE_CHAR;
+int os__FILE_TYPE_PIPE;
+int os__FILE_TYPE_UNKNOWN;
+int os__FILE_INVALID_FILE_ID;
+#define os__O_RDONLY  1
+#define os__O_WRONLY  2
+#define os__O_RDWR  3
+#define os__O_APPEND  8
+#define os__O_CREATE  16
+#define os__O_EXCL  32
+#define os__O_SYNC  64
+#define os__O_TRUNC  128
+int os__INVALID_HANDLE_VALUE;
+int os__STD_INPUT_HANDLE;
+int os__STD_OUTPUT_HANDLE;
+int os__STD_ERROR_HANDLE;
+int os__ENABLE_ECHO_INPUT;
+int os__ENABLE_EXTENDED_FLAGS;
+int os__ENABLE_INSERT_MODE;
+int os__ENABLE_LINE_INPUT;
+int os__ENABLE_MOUSE_INPUT;
+int os__ENABLE_PROCESSED_INPUT;
+int os__ENABLE_QUICK_EDIT_MODE;
+int os__ENABLE_WINDOW_INPUT;
+int os__ENABLE_VIRTUAL_TERMINAL_INPUT;
+int os__ENABLE_PROCESSED_OUTPUT;
+int os__ENABLE_WRAP_AT_EOL_OUTPUT;
+int os__ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+int os__DISABLE_NEWLINE_AUTO_RETURN;
+int os__ENABLE_LVB_GRID_WORLDWIDE;
+array_string os__args;
+#define os__MAX_PATH  4096
+#define os__FILE_ATTRIBUTE_DIRECTORY  16
 
 
  array new_array(int mylen, int cap, int elm_size) {
@@ -397,6 +709,13 @@ array arr= (array) { .len =  mylen , .cap =  cap , .element_size =  elm_size , .
 
  
  return  arr ;
+ 
+ 
+ }
+ array _make(int len, int cap, int elm_size) {
+
+ 
+ return  new_array ( len , cap , elm_size ) ;
  
  
  }
@@ -434,20 +753,6 @@ int i= 0  ;  i < nr_repeats  ;  i ++ ) {
 
  
  return  arr ;
- 
- 
- }
- void array_append_array(array* a, array b) {
- 
- for (
-int i= 0  ;  i < b .len  ;  i ++ ) { 
- 
-void* val= ( *(void**) array__get( b , i) ) ;
- 
- array__push( a , val ) ;
- 
- }
- ;
  
  
  }
@@ -678,7 +983,7 @@ int cap= (/*lpar*/ arr ->len + size ) * 2 ;
  
  memcpy ( arr ->data + arr ->element_size * arr ->len ,  val ,  arr ->element_size * size ) ;
  
- arr ->len  =  arr ->len + size ;
+ arr ->len  +=  size ;
  
  
  }
@@ -691,12 +996,12 @@ int i= 0  ;  i < a .len  ;  i ++ ) {
  
 int val= ( *(int*) array__get( a , i) ) ;
  
- res  = string_add( res , _STR("%d", val) ) ;
+ res = string_add(res,  _STR("%d", val) ) ;
  
  if ( i < a .len - 1 ) {
  /*if*/
  
- res  = string_add( res , tos2(", ") ) ;
+ res = string_add(res,  tos2(", ") ) ;
  
  }
  ;
@@ -704,7 +1009,7 @@ int val= ( *(int*) array__get( a , i) ) ;
  }
  ;
  
- res  = string_add( res , tos2("]") ) ;
+ res = string_add(res,  tos2("]") ) ;
 
  
  return  res ;
@@ -726,12 +1031,12 @@ int i= 0  ;  i < a .len  ;  i ++ ) {
  
 string val= ( *(string*) array__get( a , i) ) ;
  
- res  = string_add( res , _STR("\"%.*s\"", val.len, val.str) ) ;
+ res = string_add(res,  _STR("\"%.*s\"", val.len, val.str) ) ;
  
  if ( i < a .len - 1 ) {
  /*if*/
  
- res  = string_add( res , tos2(", ") ) ;
+ res = string_add(res,  tos2(", ") ) ;
  
  }
  ;
@@ -739,7 +1044,7 @@ string val= ( *(string*) array__get( a , i) ) ;
  }
  ;
  
- res  = string_add( res , tos2("]") ) ;
+ res = string_add(res,  tos2("]") ) ;
 
  
  return  res ;
@@ -854,44 +1159,35 @@ string clone= string_clone( s ) ;
  }
  ;
  
- if ( ! string_contains( s , rep ) ) {
- /*if*/
-
- 
- return  s ;
- 
- }
- ;
- 
 array_int idxs=new_array_from_c_array(0, 0, sizeof(int), (int[]) {   }) ;
  
  {
  
  }
  
- for (
-int i= 0  ;  i < s .len  ;  i ++ ) { 
+string rem= s ;
  
-int rep_i= 0 ;
+int rstart= 0 ;
  
-int j= i ;
+ while (1) { 
+int i= string_index( rem , rep ) ;
  
- while ( rep_i < rep .len  &&  j < s .len  &&  s .str[ j ]/*rbyte 0*/ == rep .str[ rep_i ]/*rbyte 0*/ ) {
- 
- rep_i ++ ;
- 
- j ++ ;
- 
- }
- ;
- 
- if ( rep_i == rep .len ) {
+ if ( i < 0 ) {
  /*if*/
  
-_PUSH(& idxs , ( i ), tmp12, int) ;
+ break
+ ;
  
  }
  ;
+ 
+_PUSH(& idxs , ( rstart + i ), tmp12, int) ;
+ 
+ i  +=  rep .len ;
+ 
+ rstart  +=  i ;
+ 
+ rem  =  string_substr( rem , i , rem .len ) ;
  
  }
  ;
@@ -931,7 +1227,7 @@ int j= 0  ;  j < with .len  ;  j ++ ) {
  }
  ;
  
- i  =  i + rep .len - 1 ;
+ i  +=  rep .len - 1 ;
  
  idx_pos ++ ;
  
@@ -1924,7 +2220,7 @@ int char_len= utf8_char_len ( s .str [/*ptr*/ i ]/*rbyte 0*/ ) ;
  
 _PUSH(& res .runes , ( i ), tmp97, int) ;
  
- i  =  i + char_len - 1 ;
+ i  +=  char_len - 1 ;
  
  res .len ++ ;
  
@@ -1956,7 +2252,7 @@ array_set(&/*q*/ res .runes , j , & tmp102) ;
  
  j ++ ;
  
- i  =  i + char_len - 1 ;
+ i  +=  char_len - 1 ;
  
  res .len ++ ;
  
@@ -2157,12 +2453,12 @@ int len= 0 ;
 for (int i = 0; i < tmp113 .len; i ++) {
  string val = ((string *) tmp113 . data)[i];
  
- len  =  len + val .len + del .len ;
+ len  +=  val .len + del .len ;
  
  }
  ;
  
- len  =  len - del .len ;
+ len  -=  del .len ;
  
 string res= tos2("") ;
  
@@ -2266,34 +2562,6 @@ int i= ((int)( c ) ) ;
  
  
  }
- string repeat_char(byte c, int n) {
- 
- if ( n <= 0 ) {
- /*if*/
-
- 
- return  tos2("") ;
- 
- }
- ;
- 
-byte* arr= v_malloc ( n + 1 ) ;
- 
- for (
-int i= 0  ;  i < n  ;  i ++ ) { 
- 
- arr [/*ptr*/ i ]/*rbyte 1*/  =  c ;
- 
- }
- ;
- 
- arr [/*ptr*/ n ]/*rbyte 1*/  =  '\0' ;
-
- 
- return  tos ( arr , n ) ;
- 
- 
- }
  int string_hash(string s) {
  
 int hash= ((int)( 0 ) ) ;
@@ -2348,7 +2616,7 @@ void* nr_ptrs= backtrace ( buffer ,  100 ) ;
  }
  void v_panic(string s) {
  
- println ( _STR("V panic: %.*s", s.len, s.str) ) ;
+printf( "V panic: %.*s\n", s.len, s.str ) ;
  
  print_backtrace ( ) ;
  
@@ -2448,26 +2716,12 @@ byte* ptr= malloc ( n ) ;
  
  
  }
- Option opt_ok(void* data) {
-
- 
- return  (Option) { .data =  data , .ok =  1 , .error = tos("", 0) , } ;
- 
- 
- }
  void* memdup(void* src, int sz) {
  
 byte* mem= v_malloc ( sz ) ;
 
  
  return  memcpy ( mem ,  src ,  sz ) ;
- 
- 
- }
- Option v_error(string s) {
-
- 
- return  (Option) { .error =  s , .data = 0 , .ok = 0 } ;
  
  
  }
@@ -2710,9 +2964,9 @@ int d= ((int)( n % ((i64)( 10 ) ) ) ) ;
  }
  string int_hex(int n) {
  
-string s= int_str( n ) ;
+int len= ( n >= 0 ) ? ( int_str( n ) .len + 3 ) : ( 11 ) ;
  
-byte* hex= v_malloc ( s .len + 3 ) ;
+byte* hex= v_malloc ( len ) ;
  
 int count= ((int)( sprintf ( hex ,  "0x%x" ,  n ) ) ) ;
 
@@ -2723,23 +2977,23 @@ int count= ((int)( sprintf ( hex ,  "0x%x" ,  n ) ) ) ;
  }
  string i64_hex(i64 n) {
  
-string s= i64_str( n ) ;
+int len= ( n >= ((i64)( 0 ) ) ) ? ( i64_str( n ) .len + 3 ) : ( 19 ) ;
  
-byte* hex= v_malloc ( s .len + 3 ) ;
+byte* hex= v_malloc ( len ) ;
  
- sprintf ( hex ,  "0x%x" ,  n ) ;
+int count= ((int)( sprintf ( hex ,  "0x%x" ,  n ) ) ) ;
 
  
- return  tos ( hex , s .len + 3 ) ;
+ return  tos ( hex , count ) ;
  
  
  }
  bool array_byte_contains(array_byte a, byte val) {
  
- array_byte tmp28 =  a;
+ array_byte tmp29 =  a;
  ;
-for (int tmp29 = 0; tmp29 < tmp28 .len; tmp29 ++) {
- byte aa = ((byte *) tmp28.data)[tmp29];
+for (int tmp30 = 0; tmp30 < tmp29 .len; tmp30 ++) {
+ byte aa = ((byte *) tmp29.data)[tmp30];
  
  if ( aa == val ) {
  /*if*/
@@ -2970,7 +3224,7 @@ int c= ((int)( _rune .str[ i ]/*rbyte 0*/ ) ) ;
  
  res  =  res  <<  shift ;
  
- res  =  res | c & 63 ;
+ res  |=  c & 63 ;
  
  shift  =  6 ;
  
@@ -3245,59 +3499,41 @@ if (!tmp39) tmp38 = tos("", 0);
  
 string val= tmp38 ;
  
- s  = string_add( s , _STR("  \"%.*s\" => \"%.*s\"\n", entry .key.len, entry .key.str, val.len, val.str) ) ;
+ s = string_add(s,  _STR("  \"%.*s\" => \"%.*s\"\n", entry .key.len, entry .key.str, val.len, val.str) ) ;
  
  }
  ;
  
- s  = string_add( s , tos2("}") ) ;
+ s = string_add(s,  tos2("}") ) ;
 
  
  return  s ;
  
  
  }
- StringBuilder new_string_builder(int initial_size) {
+ Option opt_ok(void* data, int size) {
+ 
+ if ( size > 255 ) {
+ /*if*/
+ 
+ v_panic ( _STR("option size too big: %d (max is 255)", size) ) ;
+ 
+ }
+ ;
+ 
+Option res= (Option) { .ok =  1 , .error = tos("", 0) , } ;
+ 
+ memcpy ( res .data ,  data ,  size ) ;
 
  
- return  (StringBuilder) { .buf =  new_array ( 0 , initial_size , sizeof( byte) ) , .len = 0 } ;
+ return  res ;
  
  
  }
- void StringBuilder_write(StringBuilder* b, string s) {
- 
- array__push_many(& /* ? */ b ->buf , s .str , s .len ) ;
- 
- b ->len  =  b ->len + s .len ;
- 
- 
- }
- void StringBuilder_writeln(StringBuilder* b, string s) {
- 
- array__push_many(& /* ? */ b ->buf , s .str , s .len ) ;
- 
-_PUSH(& b ->buf , ( '\n' ), tmp1, byte) ;
- 
- b ->len  =  b ->len + s .len + 1 ;
- 
- 
- }
- string StringBuilder_str(StringBuilder b) {
+ Option v_error(string s) {
 
  
- return  tos ( b .buf .data , b .len ) ;
- 
- 
- }
- void StringBuilder_cut(StringBuilder b, int n) {
- 
- b .len  =  b .len - n ;
- 
- 
- }
- void v_StringBuilder_free(StringBuilder* b) {
- 
- free ( b ->buf .data ) ;
+ return  (Option) { .error =  s , .ok = 0 } ;
  
  
  }
@@ -3353,7 +3589,7 @@ void* maincontext= SDL_GL_CreateContext ( w ) ;
  glBlendFunc ( vex__GL_SRC_ALPHA ,  vex__GL_ONE_MINUS_SRC_ALPHA ) ;
 int tmp3 =  0;
  
-vex__Game* g= ALLOC_INIT(vex__Game, { .window =  w , .title =  cfg .title , .running =  1 , .keys =  array_repeat(&tmp3,  256 , sizeof(int) ) , .width = 0 , .height = 0 , .x = 0 , .y = 0 , .mouseX = 0 , .mouseY = 0 , .mouseDown = 0 , } ) ;
+vex__Game* g= ALLOC_INIT(vex__Game, { .window =  w , .title =  cfg .title , .running =  1 , .keys =  array_repeat(&tmp3,  256 , sizeof(int) ) , .width = 0 , .height = 0 , .x = 0 , .y = 0 , .mouseX = 0 , .mouseY = 0 , .mouseDown = 0 , .resource_manager = 0 , } ) ;
 
  
  return  g ;
@@ -3435,7 +3671,7 @@ array_set(&/*q*/ g ->keys , key , & tmp8) ;
  }
  bool vex__Game_is_running(vex__Game* g) {
  
- vex__Game_process_event(& /* ? */* g ) ;
+ vex__Game_process_event( g ) ;
  
  if ( ( *(int*) array__get( g ->keys , vex__SDLK_ESCAPE) ) == 1 ) {
  /*if*/
@@ -3464,7 +3700,7 @@ array_set(&/*q*/ g ->keys , key , & tmp8) ;
  
  
  }
- void vex__Game_terminate(vex__Game* g) {
+ void vex__Game_quit(vex__Game* g) {
  
  SDL_DestroyWindow ( g ->window ) ;
  
@@ -3474,38 +3710,793 @@ array_set(&/*q*/ g ->keys , key , & tmp8) ;
  
  
  }
+ f32* vex__f32_calloc(int n) {
+
+ 
+ return  ((f32*)( v_calloc ( n * sizeof( f32) ) ) ) ;
+ 
+ 
+ }
+ vex__Vec2 vex__vec2(f32 x, f32 y) {
+
+ 
+ return  (vex__Vec2) { x , y } ;
+ 
+ 
+ }
+ vex__Vec3 vex__vec3(f32 x, f32 y, f32 z) {
+
+ 
+ return  (vex__Vec3) { x , y , z } ;
+ 
+ 
+ }
+ vex__Vec4 vex__vec4(f32 x, f32 y, f32 z, f32 w) {
+
+ 
+ return  (vex__Vec4) { x , y , z , w } ;
+ 
+ 
+ }
+ vex__Mat4 vex__mat4(f32* f) {
+
+ 
+ return  (vex__Mat4) { .data =  f } ;
+ 
+ 
+ }
+ string vex__Vec2_str(vex__Vec2 v) {
+
+ 
+ return  _STR("Vec3{ %f, %f }", v .x, v .y) ;
+ 
+ 
+ }
+ string vex__Vec3_str(vex__Vec3 v) {
+
+ 
+ return  _STR("Vec3{ %f, %f, %f }", v .x, v .y, v .z) ;
+ 
+ 
+ }
+ string vex__Vec4_str(vex__Vec4 v) {
+
+ 
+ return  _STR("Vec4{ %f, %f, %f, %f }", v .x, v .y, v .z, v .w) ;
+ 
+ 
+ }
+ string vex__Mat4_str(vex__Mat4 m) {
+ 
+string s= tos2("[ ") ;
+ 
+ for (
+int i= 0  ;  i < 4  ;  i ++ ) { 
+ 
+ if ( i != 0 ) {
+ /*if*/
+ 
+ s = string_add(s,  tos2("  ") ) ;
+ 
+ }
+ ;
+ 
+ for (
+int j= 0  ;  j < 4  ;  j ++ ) { 
+ 
+f32 val= m .data [/*ptr*/ i * 4 + j ]/*rf32 0*/ ;
+ 
+ s = string_add(s,  _STR("%.2f ", val) ) ;
+ 
+ }
+ ;
+ 
+ if ( i != 3 ) {
+ /*if*/
+ 
+ s = string_add(s,  tos2("\n") ) ;
+ 
+ }
+ ;
+ 
+ }
+ ;
+ 
+ s = string_add(s,  tos2("]") ) ;
+
+ 
+ return  s ;
+ 
+ 
+ }
+ vex__Vec3 vex__Vec3_add(vex__Vec3 a, vex__Vec3 b) {
+ 
+vex__Vec3 res= (vex__Vec3) { .x =  a .x + b .x , .y =  a .y + b .y , .z =  a .z + b .z } ;
+
+ 
+ return  res ;
+ 
+ 
+ }
+ vex__Vec3 vex__Vec3_sub(vex__Vec3 a, vex__Vec3 b) {
+ 
+vex__Vec3 res= (vex__Vec3) { .x =  a .x - b .x , .y =  a .y - b .y , .z =  a .z - b .z } ;
+
+ 
+ return  res ;
+ 
+ 
+ }
+ vex__Vec3 vex__Vec3_mult(vex__Vec3 a, vex__Vec3 b) {
+
+ 
+ return  vex__vec3 ( a .x * b .x , a .y * b .y , a .z * b .z ) ;
+ 
+ 
+ }
+ vex__Vec3 vex__Vec3_mult_scalar(vex__Vec3 a, f32 b) {
+ 
+vex__Vec3 res= (vex__Vec3) { .x =  a .x * b , .y =  a .y * b , .z =  a .z * b } ;
+
+ 
+ return  res ;
+ 
+ 
+ }
+ vex__Mat4 vex__glm_identity() {
+ 
+f32* res= vex__f32_calloc ( sizeof( f32) * 16 ) ;
+ 
+ res [/*ptr*/ 0 ]/*rf32 1*/  =  1 ;
+ 
+ res [/*ptr*/ 5 ]/*rf32 1*/  =  1 ;
+ 
+ res [/*ptr*/ 10 ]/*rf32 1*/  =  1 ;
+ 
+ res [/*ptr*/ 15 ]/*rf32 1*/  =  1 ;
+
+ 
+ return  vex__mat4 ( res ) ;
+ 
+ 
+ }
+ vex__Mat4 vex__glm_zero() {
+ 
+f32* res= vex__f32_calloc ( sizeof( f32) * 16 ) ;
+
+ 
+ return  vex__mat4 ( res ) ;
+ 
+ 
+ }
+ vex__Mat4 vex__glm_translate(vex__Mat4 m, vex__Vec3 v) {
+ 
+f32* a= m .data ;
+ 
+ a [/*ptr*/ 12 ]/*rf32 1*/  =  m .data [/*ptr*/ 12 ]/*rf32 0*/ + m .data [/*ptr*/ 0 ]/*rf32 0*/ * v .x + m .data [/*ptr*/ 4 ]/*rf32 0*/ * v .y + m .data [/*ptr*/ 8 ]/*rf32 0*/ * v .z ;
+ 
+ a [/*ptr*/ 13 ]/*rf32 1*/  =  m .data [/*ptr*/ 13 ]/*rf32 0*/ + m .data [/*ptr*/ 1 ]/*rf32 0*/ * v .x + m .data [/*ptr*/ 5 ]/*rf32 0*/ * v .y + m .data [/*ptr*/ 9 ]/*rf32 0*/ * v .z ;
+ 
+ a [/*ptr*/ 14 ]/*rf32 1*/  =  m .data [/*ptr*/ 14 ]/*rf32 0*/ + m .data [/*ptr*/ 2 ]/*rf32 0*/ * v .x + m .data [/*ptr*/ 6 ]/*rf32 0*/ * v .y + m .data [/*ptr*/ 10 ]/*rf32 0*/ * v .z ;
+ 
+ a [/*ptr*/ 15 ]/*rf32 1*/  =  m .data [/*ptr*/ 15 ]/*rf32 0*/ + m .data [/*ptr*/ 3 ]/*rf32 0*/ * v .x + m .data [/*ptr*/ 7 ]/*rf32 0*/ * v .y + m .data [/*ptr*/ 11 ]/*rf32 0*/ * v .z ;
+
+ 
+ return  vex__mat4 ( a ) ;
+ 
+ 
+ }
+ f32 vex__glm_length(vex__Vec3 v) {
+
+ 
+ return  math__sqrt ( v .x * v .x + v .y * v .y + v .z * v .z ) ;
+ 
+ 
+ }
+ f32 vex__glm_dot(vex__Vec3 a, vex__Vec3 b) {
+
+ 
+ return  a .x * b .x + a .y * b .y + a .z * b .z ;
+ 
+ 
+ }
+ f32 vex__glm_norm2(vex__Vec3 v) {
+
+ 
+ return  vex__glm_dot ( v , v ) ;
+ 
+ 
+ }
+ f32 vex__glm_norm(vex__Vec3 v) {
+
+ 
+ return  math__sqrt ( vex__glm_norm2 ( v ) ) ;
+ 
+ 
+ }
+ vex__Vec3 vex__glm_normalize(vex__Vec3 v) {
+ 
+f32 n= vex__glm_norm ( v ) ;
+ 
+ if ( n == 0.0 ) {
+ /*if*/
+ 
+ v .x  =  0.0 ;
+ 
+ v .y  =  0.0 ;
+ 
+ v .z  =  0.0 ;
+
+ 
+ return  v ;
+ 
+ }
+ ;
+ 
+ v .x  =  v .x * 1.0 / n ;
+ 
+ v .y  =  v .y * 1.0 / n ;
+ 
+ v .z  =  v .z * 1.0 / n ;
+
+ 
+ return  v ;
+ 
+ 
+ }
+ vex__Mat4 vex__glm_scale(vex__Mat4 m, vex__Vec3 v) {
+ 
+ m .data [/*ptr*/ 0 ]/*rf32 0*/  =  m .data [/*ptr*/ 0 ]/*rf32 0*/ * v .x ;
+ 
+ m .data [/*ptr*/ 1 ]/*rf32 0*/  =  m .data [/*ptr*/ 1 ]/*rf32 0*/ * v .x ;
+ 
+ m .data [/*ptr*/ 2 ]/*rf32 0*/  =  m .data [/*ptr*/ 2 ]/*rf32 0*/ * v .x ;
+ 
+ m .data [/*ptr*/ 3 ]/*rf32 0*/  =  m .data [/*ptr*/ 3 ]/*rf32 0*/ * v .x ;
+ 
+ m .data [/*ptr*/ 4 ]/*rf32 0*/  =  m .data [/*ptr*/ 4 ]/*rf32 0*/ * v .y ;
+ 
+ m .data [/*ptr*/ 5 ]/*rf32 0*/  =  m .data [/*ptr*/ 5 ]/*rf32 0*/ * v .y ;
+ 
+ m .data [/*ptr*/ 6 ]/*rf32 0*/  =  m .data [/*ptr*/ 6 ]/*rf32 0*/ * v .y ;
+ 
+ m .data [/*ptr*/ 7 ]/*rf32 0*/  =  m .data [/*ptr*/ 7 ]/*rf32 0*/ * v .y ;
+ 
+ m .data [/*ptr*/ 8 ]/*rf32 0*/  =  m .data [/*ptr*/ 8 ]/*rf32 0*/ * v .z ;
+ 
+ m .data [/*ptr*/ 8 ]/*rf32 0*/  =  m .data [/*ptr*/ 9 ]/*rf32 0*/ * v .z ;
+ 
+ m .data [/*ptr*/ 10 ]/*rf32 0*/  =  m .data [/*ptr*/ 10 ]/*rf32 0*/ * v .z ;
+ 
+ m .data [/*ptr*/ 11 ]/*rf32 0*/  =  m .data [/*ptr*/ 11 ]/*rf32 0*/ * v .z ;
+
+ 
+ return  m ;
+ 
+ 
+ }
+ vex__Mat4 vex__glm_ortho(f32 left, f32 right, f32 bottom, f32 top, f32 nearVal, f32 farVal) {
+ 
+vex__Mat4 proj= vex__glm_identity ( ) ;
+ 
+ proj .data [/*ptr*/ 0 ]/*rf32 1*/  =  2.0 / (/*lpar*/ right - left ) ;
+ 
+ proj .data [/*ptr*/ 5 ]/*rf32 1*/  =  2.0 / (/*lpar*/ top - bottom ) ;
+ 
+ proj .data [/*ptr*/ 10 ]/*rf32 1*/  =  - 1.0 ;
+ 
+ proj .data [/*ptr*/ 12 ]/*rf32 1*/  =  - (/*lpar*/ right + left ) / (/*lpar*/ right - left ) ;
+ 
+ proj .data [/*ptr*/ 13 ]/*rf32 1*/  =  - (/*lpar*/ top + bottom ) / (/*lpar*/ top - bottom ) ;
+ 
+ proj .data [/*ptr*/ 15 ]/*rf32 1*/  =  - nearVal / (/*lpar*/ farVal - nearVal ) ;
+
+ 
+ return  proj ;
+ 
+ 
+ }
+ vex__Mat4 vex__glm_perspective(f32 fov, f32 aspect, f32 zNear, f32 zFar) {
+ 
+f32* proj= vex__f32_calloc ( sizeof( f32) * 16 ) ;
+ 
+ proj [/*ptr*/ 5 ]/*rf32 1*/  =  math__cos ( fov / 2.0 ) / math__sin ( fov / 2.0 ) ;
+ 
+ proj [/*ptr*/ 0 ]/*rf32 1*/  =  proj [/*ptr*/ 5 ]/*rf32 1*/ / aspect ;
+ 
+ proj [/*ptr*/ 10 ]/*rf32 1*/  =  (/*lpar*/ zFar + zNear ) / (/*lpar*/ zNear - zFar ) ;
+ 
+ proj [/*ptr*/ 11 ]/*rf32 1*/  =  - 1.0 ;
+ 
+ proj [/*ptr*/ 14 ]/*rf32 1*/  =  2.0 * zNear * zFar / (/*lpar*/ zNear - zFar ) ;
+ 
+ proj [/*ptr*/ 15 ]/*rf32 1*/  =  1.0 ;
+
+ 
+ return  vex__mat4 ( proj ) ;
+ 
+ 
+ }
+ vex__Mat4 vex__glm_rotate(vex__Mat4 m, f32 angle, vex__Vec3 v) {
+ 
+f32 a= angle ;
+ 
+f64 c= math__cos ( a ) ;
+ 
+f64 s= math__sin ( a ) ;
+ 
+vex__Vec3 axis= vex__glm_normalize ( v ) ;
+ 
+vex__Vec3 temp= vex__vec3 ( (/*lpar*/ 1.0 - c ) * axis .x , (/*lpar*/ 1.0 - c ) * axis .y , (/*lpar*/ 1.0 - c ) * axis .z ) ;
+ 
+f32* rotate= vex__f32_calloc ( sizeof( f32) * 16 ) ;
+ 
+ rotate [/*ptr*/ 0 ]/*rf32 1*/  =  c + temp .x * axis .x ;
+ 
+ rotate [/*ptr*/ 1 ]/*rf32 1*/  =  temp .x * axis .y + s * axis .z ;
+ 
+ rotate [/*ptr*/ 2 ]/*rf32 1*/  =  temp .x * axis .z - s * axis .y ;
+ 
+ rotate [/*ptr*/ 4 ]/*rf32 1*/  =  temp .x * axis .x - s * axis .z ;
+ 
+ rotate [/*ptr*/ 5 ]/*rf32 1*/  =  c + temp .x * axis .y ;
+ 
+ rotate [/*ptr*/ 6 ]/*rf32 1*/  =  temp .x * axis .z + s * axis .x ;
+ 
+ rotate [/*ptr*/ 8 ]/*rf32 1*/  =  temp .z * axis .x + s * axis .y ;
+ 
+ rotate [/*ptr*/ 9 ]/*rf32 1*/  =  temp .z * axis .y - s * axis .x ;
+ 
+ rotate [/*ptr*/ 10 ]/*rf32 1*/  =  c + temp .z * axis .z ;
+ 
+f32* result= vex__f32_calloc ( sizeof( f32) * 16 ) ;
+ 
+ result [/*ptr*/ 0 ]/*rf32 1*/  =  m .data [/*ptr*/ 0 ]/*rf32 0*/ * rotate [/*ptr*/ 0 ]/*rf32 1*/ + m .data [/*ptr*/ 4 ]/*rf32 0*/ * rotate [/*ptr*/ 1 ]/*rf32 1*/ + m .data [/*ptr*/ 8 ]/*rf32 0*/ * rotate [/*ptr*/ 2 ]/*rf32 1*/ ;
+ 
+ result [/*ptr*/ 1 ]/*rf32 1*/  =  m .data [/*ptr*/ 1 ]/*rf32 0*/ * rotate [/*ptr*/ 0 ]/*rf32 1*/ + m .data [/*ptr*/ 5 ]/*rf32 0*/ * rotate [/*ptr*/ 1 ]/*rf32 1*/ + m .data [/*ptr*/ 9 ]/*rf32 0*/ * rotate [/*ptr*/ 2 ]/*rf32 1*/ ;
+ 
+ result [/*ptr*/ 2 ]/*rf32 1*/  =  m .data [/*ptr*/ 2 ]/*rf32 0*/ * rotate [/*ptr*/ 0 ]/*rf32 1*/ + m .data [/*ptr*/ 6 ]/*rf32 0*/ * rotate [/*ptr*/ 1 ]/*rf32 1*/ + m .data [/*ptr*/ 10 ]/*rf32 0*/ * rotate [/*ptr*/ 2 ]/*rf32 1*/ ;
+ 
+ result [/*ptr*/ 3 ]/*rf32 1*/  =  m .data [/*ptr*/ 3 ]/*rf32 0*/ * rotate [/*ptr*/ 0 ]/*rf32 1*/ + m .data [/*ptr*/ 7 ]/*rf32 0*/ * rotate [/*ptr*/ 1 ]/*rf32 1*/ + m .data [/*ptr*/ 11 ]/*rf32 0*/ * rotate [/*ptr*/ 2 ]/*rf32 1*/ ;
+ 
+ result [/*ptr*/ 4 ]/*rf32 1*/  =  m .data [/*ptr*/ 0 ]/*rf32 0*/ * rotate [/*ptr*/ 4 ]/*rf32 1*/ + m .data [/*ptr*/ 4 ]/*rf32 0*/ * rotate [/*ptr*/ 5 ]/*rf32 1*/ + m .data [/*ptr*/ 8 ]/*rf32 0*/ * rotate [/*ptr*/ 6 ]/*rf32 1*/ ;
+ 
+ result [/*ptr*/ 5 ]/*rf32 1*/  =  m .data [/*ptr*/ 1 ]/*rf32 0*/ * rotate [/*ptr*/ 4 ]/*rf32 1*/ + m .data [/*ptr*/ 5 ]/*rf32 0*/ * rotate [/*ptr*/ 5 ]/*rf32 1*/ + m .data [/*ptr*/ 9 ]/*rf32 0*/ * rotate [/*ptr*/ 6 ]/*rf32 1*/ ;
+ 
+ result [/*ptr*/ 6 ]/*rf32 1*/  =  m .data [/*ptr*/ 2 ]/*rf32 0*/ * rotate [/*ptr*/ 4 ]/*rf32 1*/ + m .data [/*ptr*/ 6 ]/*rf32 0*/ * rotate [/*ptr*/ 5 ]/*rf32 1*/ + m .data [/*ptr*/ 10 ]/*rf32 0*/ * rotate [/*ptr*/ 6 ]/*rf32 1*/ ;
+ 
+ result [/*ptr*/ 7 ]/*rf32 1*/  =  m .data [/*ptr*/ 3 ]/*rf32 0*/ * rotate [/*ptr*/ 4 ]/*rf32 1*/ + m .data [/*ptr*/ 7 ]/*rf32 0*/ * rotate [/*ptr*/ 5 ]/*rf32 1*/ + m .data [/*ptr*/ 11 ]/*rf32 0*/ * rotate [/*ptr*/ 6 ]/*rf32 1*/ ;
+ 
+ result [/*ptr*/ 8 ]/*rf32 1*/  =  m .data [/*ptr*/ 0 ]/*rf32 0*/ * rotate [/*ptr*/ 8 ]/*rf32 1*/ + m .data [/*ptr*/ 4 ]/*rf32 0*/ * rotate [/*ptr*/ 9 ]/*rf32 1*/ + m .data [/*ptr*/ 8 ]/*rf32 0*/ * rotate [/*ptr*/ 10 ]/*rf32 1*/ ;
+ 
+ result [/*ptr*/ 9 ]/*rf32 1*/  =  m .data [/*ptr*/ 1 ]/*rf32 0*/ * rotate [/*ptr*/ 8 ]/*rf32 1*/ + m .data [/*ptr*/ 5 ]/*rf32 0*/ * rotate [/*ptr*/ 9 ]/*rf32 1*/ + m .data [/*ptr*/ 9 ]/*rf32 0*/ * rotate [/*ptr*/ 10 ]/*rf32 1*/ ;
+ 
+ result [/*ptr*/ 10 ]/*rf32 1*/  =  m .data [/*ptr*/ 2 ]/*rf32 0*/ * rotate [/*ptr*/ 8 ]/*rf32 1*/ + m .data [/*ptr*/ 6 ]/*rf32 0*/ * rotate [/*ptr*/ 9 ]/*rf32 1*/ + m .data [/*ptr*/ 10 ]/*rf32 0*/ * rotate [/*ptr*/ 10 ]/*rf32 1*/ ;
+ 
+ result [/*ptr*/ 11 ]/*rf32 1*/  =  m .data [/*ptr*/ 3 ]/*rf32 0*/ * rotate [/*ptr*/ 8 ]/*rf32 1*/ + m .data [/*ptr*/ 7 ]/*rf32 0*/ * rotate [/*ptr*/ 9 ]/*rf32 1*/ + m .data [/*ptr*/ 11 ]/*rf32 0*/ * rotate [/*ptr*/ 10 ]/*rf32 1*/ ;
+ 
+ result [/*ptr*/ 12 ]/*rf32 1*/  =  m .data [/*ptr*/ 12 ]/*rf32 0*/ ;
+ 
+ result [/*ptr*/ 13 ]/*rf32 1*/  =  m .data [/*ptr*/ 13 ]/*rf32 0*/ ;
+ 
+ result [/*ptr*/ 14 ]/*rf32 1*/  =  m .data [/*ptr*/ 14 ]/*rf32 0*/ ;
+ 
+ result [/*ptr*/ 15 ]/*rf32 1*/  =  m .data [/*ptr*/ 15 ]/*rf32 0*/ ;
+
+ 
+ return  vex__mat4 ( result ) ;
+ 
+ 
+ }
  vex__ResourceManager* vex__create_resource_manager() {
  
-vex__ResourceManager* r= ALLOC_INIT(vex__ResourceManager, { } ) ;
+array_vex__Shader shaders=new_array_from_c_array(0, 0, sizeof(vex__Shader), (vex__Shader[]) {   }) ;
+ 
+ {
+ 
+ }
+ 
+array_vex__Texture2D textures=new_array_from_c_array(0, 0, sizeof(vex__Texture2D), (vex__Texture2D[]) {   }) ;
+ 
+ {
+ 
+ }
+ 
+vex__ResourceManager* r= ALLOC_INIT(vex__ResourceManager, { .shader_index =  new_map(1, sizeof(int)) , .shader_data =  shaders , .texture_index =  new_map(1, sizeof(int)) , .texture_data =  textures } ) ;
 
  
  return  r ;
  
  
  }
- vex__Shader* vex__create_shader() {
+ vex__Shader* vex__ResourceManager_load_shader(vex__ResourceManager* r, string vertex_file, string fragment_file, string name) {
  
-vex__Shader* s= ALLOC_INIT(vex__Shader, { } ) ;
+int i= r ->shader_data .len ;
+ 
+_PUSH(& r ->shader_data , ( (vex__Shader) { } ), tmp5, vex__Shader) ;
+int tmp6 =  i;
+ 
+map__set(& r ->shader_index , name , & tmp6) ;
+ 
+ vex__ResourceManager_load_shader_from_file( r , vertex_file , fragment_file ,& /*11 EXP:"vex__Shader*" GOT:"vex__Shader" */ ( *(vex__Shader*) array__get( r ->shader_data , i) ) ) ;
+
+ 
+ return  & /*vvar*/  ( *(vex__Shader*) array__get( r ->shader_data , i) ) ;
+ 
+ 
+ }
+ vex__Shader* vex__ResourceManager_get_shader(vex__ResourceManager* r, string name) {
+int tmp11 = 0; bool tmp12 = map_get( r ->shader_index , name, & tmp11);
+ 
+int i= tmp11 ;
+
+ 
+ return  & /*vvar*/  ( *(vex__Shader*) array__get( r ->shader_data , i) ) ;
+ 
+ 
+ }
+ string vex__read_shader_file(string path) {
+ 
+Option_string tmp16 =  os__read_file ( path ) ; if (!tmp16 .ok) {
+
+ 
+ return  tos2("") ;
+ 
+ }
+ string content = *(string*) tmp16 . data;
+ ;
+
+ 
+ return  content ;
+ 
+ 
+ }
+ void vex__ResourceManager_load_shader_from_file(vex__ResourceManager* r, string vertex_file, string fragment_file, vex__Shader* shader) {
+ 
+ if ( ! os__file_exists ( vertex_file ) ) {
+ /*if*/
+ 
+printf( "vertex shader file not found: %.*s\n", vertex_file.len, vertex_file.str ) ;
+ 
+ }
+ ;
+ 
+string vertex_code= vex__read_shader_file ( vertex_file ) ;
+ 
+ if ( ! os__file_exists ( fragment_file ) ) {
+ /*if*/
+ 
+printf( "vertex shader file not found: %.*s\n", fragment_file.len, fragment_file.str ) ;
+ 
+ }
+ ;
+ 
+string fragment_code= vex__read_shader_file ( fragment_file ) ;
+ 
+ vex__Shader_compile( shader , vertex_code , fragment_code ) ;
+ 
+ 
+ }
+ vex__Texture2D* vex__ResourceManager_load_texture(vex__ResourceManager* r, string path, bool alpha, string name) {
+ 
+int i= r ->texture_data .len ;
+ 
+_PUSH(& r ->texture_data , ( (vex__Texture2D) { .path = tos("", 0) } ), tmp20, vex__Texture2D) ;
+int tmp21 =  i;
+ 
+map__set(& r ->texture_index , name , & tmp21) ;
+ 
+ vex__ResourceManager_load_texture_from_file( r , path , alpha ,& /*11 EXP:"vex__Texture2D*" GOT:"vex__Texture2D" */ ( *(vex__Texture2D*) array__get( r ->texture_data , i) ) ) ;
+
+ 
+ return  & /*vvar*/  ( *(vex__Texture2D*) array__get( r ->texture_data , i) ) ;
+ 
+ 
+ }
+ vex__Texture2D* vex__ResourceManager_get_texture(vex__ResourceManager* r, string name) {
+int tmp26 = 0; bool tmp27 = map_get( r ->texture_index , name, & tmp26);
+ 
+int i= tmp26 ;
+
+ 
+ return  & /*vvar*/  ( *(vex__Texture2D*) array__get( r ->texture_data , i) ) ;
+ 
+ 
+ }
+ void vex__ResourceManager_load_texture_from_file(vex__ResourceManager* r, string path, bool alpha, vex__Texture2D* texture) {
+ 
+ if ( ! os__file_exists ( path ) ) {
+ /*if*/
+ 
+printf( "texture file not found: %.*s\n", path.len, path.str ) ;
+ 
+ }
+ ;
+ 
+ vex__Texture2D_init( texture , path ) ;
+struct /*c struct init*/
+ 
+SDL_Surface* surface= ALLOC_INIT(SDL_Surface, { .format = 0 , .w = 0 , .h = 0 , .pitch = 0 , .pixels = 0 , .userdata = 0 , .locked = 0 , .lock_data = 0 , .map = 0 , .refcount = 0 } ) ;
+ 
+ surface  =  IMG_Load ( path .str ) ;
+ 
+ if ( SDL_MUSTLOCK ( surface ) ) {
+ /*if*/
+ 
+ SDL_LockSurface ( surface ) ;
+ 
+ }
+ ;
+ 
+ vex__Texture2D_generate( texture , surface ->w , surface ->h , surface ->pixels ) ;
+ 
+ if ( SDL_MUSTLOCK ( surface ) ) {
+ /*if*/
+ 
+ SDL_UnlockSurface ( surface ) ;
+ 
+ }
+ ;
+ 
+ SDL_FreeSurface ( surface ) ;
+ 
+ 
+ }
+ vex__Shader* vex__Shader_use(vex__Shader* s) {
+ 
+ glUseProgram ( s ->id ) ;
 
  
  return  s ;
  
  
  }
- vex__SpriteRenderer* vex__create_sprite_renderer() {
+ void vex__Shader_check_compile_errors(vex__Shader* s, u32 object, string typ) {
  
-vex__SpriteRenderer* s= ALLOC_INIT(vex__SpriteRenderer, { } ) ;
+int success= 0 ;
+ 
+byteptr info_log= ((byteptr)( v_malloc ( 1024 ) ) ) ;
+ 
+ if (string_eq( typ , tos2("PROGRAM") ) ) {
+ /*if*/
+ 
+ glGetShaderiv ( object ,  vex__GL_COMPILE_STATUS ,  & /*vvar*/  success ) ;
+ 
+printf( "| ERROR::SHADER: Compile-time error: Type: %.*s\n\n", typ.len, typ.str ) ;
+ 
+ println ( tos (& /*11 EXP:"byte*" GOT:"byteptr" */ info_log , strlen ( info_log ) ) ) ;
+ 
+ println ( tos2("-- --------------------------------------------------- --") ) ;
+ 
+ }
+  else { 
+ /*else if*/
+ 
+ glGetShaderiv ( object ,  vex__GL_LINK_STATUS ,  & /*vvar*/  success ) ;
+ 
+printf( "| ERROR::SHADER: Link-time error: Type: %.*s\n\n", typ.len, typ.str ) ;
+ 
+ println ( tos (& /*11 EXP:"byte*" GOT:"byteptr" */ info_log , strlen ( info_log ) ) ) ;
+ 
+ println ( tos2("-- --------------------------------------------------- --") ) ;
+ 
+ }
+ ;
+ 
+ 
+ }
+ void vex__Shader_compile(vex__Shader* s, string vertex_source, string fragment_source) {
+ 
+u32 sVertex= ((u32)( 0 ) ) ;
+ 
+u32 sFragment= ((u32)( 0 ) ) ;
+ 
+ sVertex  =  glCreateShader ( vex__GL_VERTEX_SHADER ) ;
+ 
+ glShaderSource ( sVertex ,  1 ,  & /*vvar*/  vertex_source ,  0 ) ;
+ 
+ glCompileShader ( sVertex ) ;
+ 
+ vex__Shader_check_compile_errors( s , sVertex , tos2("VERTEX") ) ;
+ 
+ sFragment  =  glCreateShader ( vex__GL_FRAGMENT_SHADER ) ;
+ 
+ glShaderSource ( sFragment ,  1 ,  & /*vvar*/  fragment_source ,  0 ) ;
+ 
+ glCompileShader ( sFragment ) ;
+ 
+ vex__Shader_check_compile_errors( s , sVertex , tos2("FRAGMENT") ) ;
+ 
+ s ->id  =  glCreateProgram ( ) ;
+ 
+ glAttachShader ( s ->id ,  sVertex ) ;
+ 
+ glAttachShader ( s ->id ,  sFragment ) ;
+ 
+ glLinkProgram ( s ->id ) ;
+ 
+ vex__Shader_check_compile_errors( s , s ->id , tos2("PROGRAM") ) ;
+ 
+ glDeleteShader ( sVertex ) ;
+ 
+ glDeleteShader ( sFragment ) ;
+ 
+ 
+ }
+ void vex__Shader_set_float(vex__Shader* s, string name, f32 value, bool use_shader) {
+ 
+ if ( use_shader ) {
+ /*if*/
+ 
+ vex__Shader_use( s ) ;
+ 
+ }
+ ;
+ 
+ glUniform1f ( glGetUniformLocation ( s ->id ,  & /*vvar*/  name ) ,  value ) ;
+ 
+ 
+ }
+ void vex__Shader_set_integer(vex__Shader* s, string name, int value, bool use_shader) {
+ 
+ if ( use_shader ) {
+ /*if*/
+ 
+ vex__Shader_use( s ) ;
+ 
+ }
+ ;
+ 
+ glUniform1i ( glGetUniformLocation ( s ->id ,  & /*vvar*/  name ) ,  value ) ;
+ 
+ 
+ }
+ void vex__Shader_set_float2(vex__Shader* s, string name, f32 x, f32 y, bool use_shader) {
+ 
+ if ( use_shader ) {
+ /*if*/
+ 
+ vex__Shader_use( s ) ;
+ 
+ }
+ ;
+ 
+ glUniform2f ( glGetUniformLocation ( s ->id ,  & /*vvar*/  name ) ,  x ,  y ) ;
+ 
+ 
+ }
+ void vex__Shader_set_float3(vex__Shader* s, string name, f32 x, f32 y, f32 z, bool use_shader) {
+ 
+ if ( use_shader ) {
+ /*if*/
+ 
+ vex__Shader_use( s ) ;
+ 
+ }
+ ;
+ 
+ glUniform3f ( glGetUniformLocation ( s ->id ,  & /*vvar*/  name ) ,  x ,  y ,  z ) ;
+ 
+ 
+ }
+ void vex__Shader_set_vector3(vex__Shader* s, string name, vex__Vec3 v, bool use_shader) {
+ 
+ if ( use_shader ) {
+ /*if*/
+ 
+ vex__Shader_use( s ) ;
+ 
+ }
+ ;
+ 
+ glUniform3f ( glGetUniformLocation ( s ->id ,  & /*vvar*/  name ) ,  v .x ,  v .y ,  v .z ) ;
+ 
+ 
+ }
+ void vex__Shader_set_float4(vex__Shader* s, string name, f32 x, f32 y, f32 z, f32 w, bool use_shader) {
+ 
+ if ( use_shader ) {
+ /*if*/
+ 
+ vex__Shader_use( s ) ;
+ 
+ }
+ ;
+ 
+ glUniform4f ( glGetUniformLocation ( s ->id ,  & /*vvar*/  name ) ,  x ,  y ,  z ,  w ) ;
+ 
+ 
+ }
+ void vex__Shader_set_matrix(vex__Shader* s, string name, vex__Mat4 mat, bool use_shader) {
+ 
+ if ( use_shader ) {
+ /*if*/
+ 
+ vex__Shader_use( s ) ;
+ 
+ }
+ ;
+ 
+ glUniformMatrix4fv ( glGetUniformLocation ( s ->id ,  & /*vvar*/  name ) ,  1 ,  vex__GL_FALSE ,  & /*vvar*/  mat .data ) ;
+ 
+ 
+ }
+ vex__SpriteRenderer* vex__create_sprite_renderer(vex__Shader* shader) {
+ 
+vex__SpriteRenderer* s= ALLOC_INIT(vex__SpriteRenderer, { .shader =  shader , } ) ;
+ 
+ vex__SpriteRenderer_init_render_data( s ) ;
 
  
  return  s ;
  
  
  }
- vex__Texture2D* vex__create_texture2d(string path) {
+ void vex__SpriteRenderer_draw_sprite(vex__SpriteRenderer* s, vex__Texture2D* texture, vex__Vec2 position, vex__Vec2 size, f32 rotate, vex__Vec3 color) {
  
-vex__Texture2D* t= ALLOC_INIT(vex__Texture2D, { .path =  path , } ) ;
+ vex__Shader_use(& /* ? */ s ->shader ) ;
  
- glGenTextures ( 1 ,  & /*vvar*/  t ->id ) ;
+vex__Mat4 model= vex__glm_identity ( ) ;
+ 
+ model  =  vex__glm_translate ( model , vex__vec3 ( position .x , position .y , 0 ) ) ;
+ 
+ model  =  vex__glm_translate ( model , vex__vec3 ( 0.5 * size .x , 0.5 * size .y , 0 ) ) ;
+ 
+ model  =  vex__glm_translate ( model , vex__vec3 ( ((f32)( 0.5 ) ) * size .x , ((f32)( 0.5 ) ) * size .y , ((f32)( 0 ) ) ) ) ;
+ 
+ model  =  vex__glm_rotate ( model , rotate , vex__vec3 ( ((f32)( 0 ) ) , ((f32)( 0 ) ) , ((f32)( 1 ) ) ) ) ;
+ 
+ model  =  vex__glm_translate ( model , vex__vec3 ( - ((f32)( 0.5 ) ) * size .x , - ((f32)( 0.5 ) ) * size .y , ((f32)( 0 ) ) ) ) ;
+ 
+ model  =  vex__glm_scale ( model , vex__vec3 ( size .x , size .y , ((f32)( 1 ) ) ) ) ;
+ 
+ vex__Shader_set_matrix(& /* ? */ s ->shader , tos2("model") , model , 1 ) ;
+ 
+ vex__Shader_set_float3(& /* ? */ s ->shader , tos2("spriteColor") , color .x , color .y , color .z , 1 ) ;
+ 
+ vex__Shader_set_vector3(& /* ? */ s ->shader , tos2("spriteColor") , color , 1 ) ;
+ 
+ glActiveTexture ( vex__GL_TEXTURE0 ) ;
+ 
+ vex__Texture2D_bind( texture ) ;
+ 
+ glBindVertexArray ( s ->vao ) ;
+ 
+ glDrawArrays ( vex__GL_TRIANGLES ,  0 ,  6 ) ;
+ 
+ glBindVertexArray ( 0 ) ;
+ 
+ 
+ }
+ void vex__SpriteRenderer_init_render_data(vex__SpriteRenderer* s) {
+ 
+u32 vbo= ((u32)( 0 ) ) ;
+ 
+array_f32 vertices=new_array_from_c_array(24, 24, sizeof(f32), (f32[]) {  ((f32)( 0 ) ) ,  ((f32)( 1 ) ) ,  ((f32)( 0 ) ) ,  ((f32)( 1 ) ) ,  ((f32)( 1 ) ) ,  ((f32)( 0 ) ) ,  ((f32)( 1 ) ) ,  ((f32)( 0 ) ) ,  ((f32)( 0 ) ) ,  ((f32)( 0 ) ) ,  ((f32)( 0 ) ) ,  ((f32)( 0 ) ) ,  ((f32)( 0 ) ) ,  ((f32)( 1 ) ) ,  ((f32)( 0 ) ) ,  ((f32)( 1 ) ) ,  ((f32)( 1 ) ) ,  ((f32)( 1 ) ) ,  ((f32)( 1 ) ) ,  ((f32)( 1 ) ) ,  ((f32)( 1 ) ) ,  ((f32)( 0 ) ) ,  ((f32)( 1 ) ) ,  ((f32)( 0 ) )  }) ;
+ 
+ glGenVertexArrays ( 1 ,  & /*vvar*/  s ->vao ) ;
+ 
+ glGenBuffers ( 1 ,  & /*vvar*/  vbo ) ;
+ 
+ glBindBuffer ( vex__GL_ARRAY_BUFFER ,  vbo ) ;
+ 
+ glBufferData ( vex__GL_ARRAY_BUFFER ,  24 ,  & /*vvar*/  vertices ,  vex__GL_STATIC_DRAW ) ;
+ 
+ glBindVertexArray ( s ->vao ) ;
+ 
+ glEnableVertexAttribArray ( 0 ) ;
+ 
+ glVertexAttribPointer ( 0 ,  4 ,  vex__GL_FLOAT ,  vex__GL_FALSE ,  4 * 4 ,  0 ) ;
+ 
+ glBindBuffer ( vex__GL_ARRAY_BUFFER ,  0 ) ;
+ 
+ glBindVertexArray ( 0 ) ;
+ 
+ 
+ }
+ void vex__Texture2D_init(vex__Texture2D* t, string path) {
+ 
+ t ->path  =  path ;
  
  t ->internal_format  =  ((u32)( vex__GL_RGB ) ) ;
  
@@ -3518,9 +4509,8 @@ vex__Texture2D* t= ALLOC_INIT(vex__Texture2D, { .path =  path , } ) ;
  t ->filter_min  =  ((u32)( vex__GL_LINEAR ) ) ;
  
  t ->filter_mag  =  ((u32)( vex__GL_LINEAR ) ) ;
-
  
- return  t ;
+ glGenTextures ( 1 ,  & /*vvar*/  t ->id ) ;
  
  
  }
@@ -3588,8 +4578,1463 @@ bool res= 1 ;
  
  
  }
+ math__Fraction math__fraction(i64 n, i64 d) {
+ 
+ if ( d != 0 ) {
+ /*if*/
+
+ 
+ return  (math__Fraction) { n , d } ;
+ 
+ }
+  else { 
+ /*else if*/
+ 
+ v_panic ( tos2("Denominator cannot be zero") ) ;
+ 
+ }
+ ;
+ 
+ 
+ }
+ string math__Fraction_str(math__Fraction f) {
+
+ 
+ return  _STR("%lld/%lld", f .n, f .d) ;
+ 
+ 
+ }
+ math__Fraction math__Fraction_plus(math__Fraction f1, math__Fraction f2) {
+ 
+ if ( f1 .d == f2 .d ) {
+ /*if*/
+
+ 
+ return  (math__Fraction) { f1 .n + f2 .n , f1 .d } ;
+ 
+ }
+  else { 
+ /*else if*/
+
+ 
+ return  (math__Fraction) { (/*lpar*/ f1 .n * f2 .d ) + (/*lpar*/ f2 .n * f1 .d ) , f1 .d * f2 .d } ;
+ 
+ }
+ ;
+ 
+ 
+ }
+ math__Fraction math__Fraction_minus(math__Fraction f1, math__Fraction f2) {
+ 
+ if ( f1 .d == f2 .d ) {
+ /*if*/
+
+ 
+ return  (math__Fraction) { f1 .n - f2 .n , f1 .d } ;
+ 
+ }
+  else { 
+ /*else if*/
+
+ 
+ return  (math__Fraction) { (/*lpar*/ f1 .n * f2 .d ) - (/*lpar*/ f2 .n * f1 .d ) , f1 .d * f2 .d } ;
+ 
+ }
+ ;
+ 
+ 
+ }
+ math__Fraction math__Fraction_add(math__Fraction f1, math__Fraction f2) {
+
+ 
+ return math__Fraction_plus( f1 , f2 ) ;
+ 
+ 
+ }
+ math__Fraction math__Fraction_subtract(math__Fraction f1, math__Fraction f2) {
+
+ 
+ return math__Fraction_minus( f1 , f2 ) ;
+ 
+ 
+ }
+ math__Fraction math__Fraction_multiply(math__Fraction f1, math__Fraction f2) {
+
+ 
+ return  (math__Fraction) { f1 .n * f2 .n , f1 .d * f2 .d } ;
+ 
+ 
+ }
+ math__Fraction math__Fraction_divide(math__Fraction f1, math__Fraction f2) {
+
+ 
+ return  (math__Fraction) { f1 .n * f2 .d , f1 .d * f2 .n } ;
+ 
+ 
+ }
+ math__Fraction math__Fraction_reciprocal(math__Fraction f1) {
+
+ 
+ return  (math__Fraction) { f1 .d , f1 .n } ;
+ 
+ 
+ }
+ i64 math__Fraction_gcd(math__Fraction f1) {
+
+ 
+ return  math__gcd ( f1 .n , f1 .d ) ;
+ 
+ 
+ }
+ math__Fraction math__Fraction_reduce(math__Fraction f1) {
+ 
+i64 cf= math__gcd ( f1 .n , f1 .d ) ;
+
+ 
+ return  (math__Fraction) { f1 .n / cf , f1 .d / cf } ;
+ 
+ 
+ }
+ f64 math__Fraction_f64(math__Fraction f1) {
+
+ 
+ return  ((f64)( f1 .n ) ) / ((f64)( f1 .d ) ) ;
+ 
+ 
+ }
+ bool math__Fraction_equals(math__Fraction f1, math__Fraction f2) {
+ 
+math__Fraction r1= math__Fraction_reduce( f1 ) ;
+ 
+math__Fraction r2= math__Fraction_reduce( f2 ) ;
+
+ 
+ return  (/*lpar*/ r1 .n == r2 .n )  &&  (/*lpar*/ r1 .d == r2 .d ) ;
+ 
+ 
+ }
+ f64 math__abs(f64 a) {
+ 
+ if ( a < 0 ) {
+ /*if*/
+
+ 
+ return  - a ;
+ 
+ }
+ ;
+
+ 
+ return  a ;
+ 
+ 
+ }
+ f64 math__acos(f64 a) {
+
+ 
+ return  acos ( a ) ;
+ 
+ 
+ }
+ f64 math__asin(f64 a) {
+
+ 
+ return  asin ( a ) ;
+ 
+ 
+ }
+ f64 math__atan(f64 a) {
+
+ 
+ return  atan ( a ) ;
+ 
+ 
+ }
+ f64 math__atan2(f64 a, f64 b) {
+
+ 
+ return  atan2 ( a ,  b ) ;
+ 
+ 
+ }
+ f64 math__cbrt(f64 a) {
+
+ 
+ return  cbrt ( a ) ;
+ 
+ 
+ }
+ f64 math__ceil(f64 a) {
+
+ 
+ return  ceil ( a ) ;
+ 
+ 
+ }
+ f64 math__cos(f64 a) {
+
+ 
+ return  cos ( a ) ;
+ 
+ 
+ }
+ f64 math__cosh(f64 a) {
+
+ 
+ return  cosh ( a ) ;
+ 
+ 
+ }
+ f64 math__exp(f64 a) {
+
+ 
+ return  exp ( a ) ;
+ 
+ 
+ }
+ array_int math__digits(int n, int base) {
+ 
+int sign= 1 ;
+ 
+ if ( n < 0 ) {
+ /*if*/
+ 
+ sign  =  - 1 ;
+ 
+ n  =  - n ;
+ 
+ }
+ ;
+ 
+array_int res=new_array_from_c_array(0, 0, sizeof(int), (int[]) {   }) ;
+ 
+ while ( n != 0 ) {
+ 
+_PUSH(& res , ( (/*lpar*/ n % base ) * sign ), tmp3, int) ;
+ 
+ n  /=  base ;
+ 
+ }
+ ;
+
+ 
+ return  res ;
+ 
+ 
+ }
+ f64 math__exp2(f64 a) {
+
+ 
+ return  exp2 ( a ) ;
+ 
+ 
+ }
+ f64 math__floor(f64 a) {
+
+ 
+ return  floor ( a ) ;
+ 
+ 
+ }
+ f64 math__fmod(f64 a, f64 b) {
+
+ 
+ return  fmod ( a ,  b ) ;
+ 
+ 
+ }
+ i64 math__gcd(i64 a, i64 b) {
+ 
+ if ( a < 0 ) {
+ /*if*/
+ 
+ a  =  - a ;
+ 
+ }
+ ;
+ 
+ if ( b < 0 ) {
+ /*if*/
+ 
+ b  =  - b ;
+ 
+ }
+ ;
+ 
+ while ( b != 0 ) {
+ 
+ a  %=  b ;
+ 
+ if ( a == 0 ) {
+ /*if*/
+
+ 
+ return  b ;
+ 
+ }
+ ;
+ 
+ b  %=  a ;
+ 
+ }
+ ;
+
+ 
+ return  a ;
+ 
+ 
+ }
+ i64 math__lcm(i64 a, i64 b) {
+ 
+ if ( a == 0 ) {
+ /*if*/
+
+ 
+ return  a ;
+ 
+ }
+ ;
+ 
+i64 res= a * (/*lpar*/ b / math__gcd ( b , a ) ) ;
+ 
+ if ( res < 0 ) {
+ /*if*/
+
+ 
+ return  - res ;
+ 
+ }
+ ;
+
+ 
+ return  res ;
+ 
+ 
+ }
+ f64 math__log(f64 a) {
+
+ 
+ return  log ( a ) ;
+ 
+ 
+ }
+ f64 math__log2(f64 a) {
+
+ 
+ return  log ( a ) / log ( 2 ) ;
+ 
+ 
+ }
+ f64 math__log10(f64 a) {
+
+ 
+ return  log10 ( a ) ;
+ 
+ 
+ }
+ f64 math__log_n(f64 a, f64 b) {
+
+ 
+ return  log ( a ) / log ( b ) ;
+ 
+ 
+ }
+ f64 math__max(f64 a, f64 b) {
+ 
+ if ( a > b ) {
+ /*if*/
+
+ 
+ return  a ;
+ 
+ }
+ ;
+
+ 
+ return  b ;
+ 
+ 
+ }
+ f64 math__min(f64 a, f64 b) {
+ 
+ if ( a < b ) {
+ /*if*/
+
+ 
+ return  a ;
+ 
+ }
+ ;
+
+ 
+ return  b ;
+ 
+ 
+ }
+ f64 math__pow(f64 a, f64 b) {
+
+ 
+ return  pow ( a ,  b ) ;
+ 
+ 
+ }
+ f64 math__radians(f64 degrees) {
+
+ 
+ return  degrees * (/*lpar*/ math__Pi / 180.0 ) ;
+ 
+ 
+ }
+ f64 math__degrees(f64 radians) {
+
+ 
+ return  radians * (/*lpar*/ 180.0 / math__Pi ) ;
+ 
+ 
+ }
+ f64 math__round(f64 f) {
+
+ 
+ return  round ( f ) ;
+ 
+ 
+ }
+ f64 math__sin(f64 a) {
+
+ 
+ return  sin ( a ) ;
+ 
+ 
+ }
+ f64 math__sinh(f64 a) {
+
+ 
+ return  sinh ( a ) ;
+ 
+ 
+ }
+ f64 math__sqrt(f64 a) {
+
+ 
+ return  sqrt ( a ) ;
+ 
+ 
+ }
+ f64 math__tan(f64 a) {
+
+ 
+ return  tan ( a ) ;
+ 
+ 
+ }
+ f64 math__tanh(f64 a) {
+
+ 
+ return  tanh ( a ) ;
+ 
+ 
+ }
+ f64 math__trunc(f64 a) {
+
+ 
+ return  trunc ( a ) ;
+ 
+ 
+ }
+ i64 math__factorial(int a) {
+ 
+ if ( a < 0 ) {
+ /*if*/
+ 
+ v_panic ( tos2("factorial: Cannot find factorial of negative number") ) ;
+ 
+ }
+ ;
+ 
+int prod= 1 ;
+ 
+ for (
+int i= 0  ;  i < a  ;  i ++ ) { 
+ 
+ prod  *=  (/*lpar*/ i + 1 ) ;
+ 
+ }
+ ;
+
+ 
+ return  prod ;
+ 
+ 
+ }
+ void os__todo_remove() {
+ 
+ 
+ }
+ array_string os__init_os_args(int argc, byteptr* argv) {
+ 
+array_string args=new_array_from_c_array(0, 0, sizeof(string), (string[]) {   }) ;
+ 
+ for (
+int i= 0  ;  i < argc  ;  i ++ ) { 
+ 
+_PUSH(& args , ( (tos2( argv [/*ptr*/ i ]/*rbyteptr 0*/ ) ) ), tmp3, string) ;
+ 
+ }
+ ;
+
+ 
+ return  args ;
+ 
+ 
+ }
+ array_string os__parse_windows_cmd_line(byte* cmd) {
+ 
+string s= (tos2( cmd ) ) ;
+
+ 
+ return  string_split( s , tos2(" ") ) ;
+ 
+ 
+ }
+ Option_string os__read_file(string path) {
+ 
+string res= tos2("") ;
+ 
+string mode= tos2("rb") ;
+ 
+byte* cpath= string_cstr( path ) ;
+ 
+void* fp= fopen ( cpath ,  string_cstr( mode ) ) ;
+ 
+ if ( isnil ( fp ) ) {
+ /*if*/
+
+ 
+ return  v_error ( _STR("failed to open file \"%.*s\"", path.len, path.str) ) ;
+ 
+ }
+ ;
+ 
+ fseek ( fp ,  0 ,  SEEK_END ) ;
+ 
+int fsize= ftell ( fp ) ;
+ 
+ rewind ( fp ) ;
+ 
+byte* str= v_malloc ( fsize + 1 ) ;
+ 
+ fread ( str ,  fsize ,  1 ,  fp ) ;
+ 
+ fclose ( fp ) ;
+ 
+ str [/*ptr*/ fsize ]/*rbyte 1*/  =  0 ;
+ 
+ res  =  tos ( str , fsize ) ;
+
+ 
+ return opt_ok(&  res , sizeof(string)) ;
+ 
+ 
+ }
+ int os__file_size(string path) {
+struct /*c struct init*/
+ 
+stat s= (struct stat) { .st_size = 0 , .st_mode = 0 } ;
+ 
+ stat ( path .str ,  & /*vvar*/  s ) ;
+
+ 
+ return  s .st_size ;
+ 
+ 
+ }
+ void os__mv(string old, string new) {
+ 
+ rename ( string_cstr( old ) ,  string_cstr( new ) ) ;
+ 
+ 
+ }
+ array_string os__read_lines(string path) {
+ 
+array_string res=new_array_from_c_array(0, 0, sizeof(string), (string[]) {   }) ;
+ 
+byte buf  [1000 ]= {} /* arkek init*/ ;
+ 
+byte* cpath= string_cstr( path ) ;
+ 
+void* fp= fopen ( cpath ,  "rb" ) ;
+ 
+ if ( isnil ( fp ) ) {
+ /*if*/
+
+ 
+ return  res ;
+ 
+ }
+ ;
+ 
+ while ( fgets ( buf ,  1000 ,  fp ) != 0 ) {
+ 
+string val= tos2("") ;
+ 
+ buf [ strlen ( buf ) - 1 ]/*rbyte 1*/  =  '\0' ;
+ 
+ #ifdef _WIN32
+ 
+ if ( buf [ strlen ( buf ) - 2 ]/*rbyte 1*/ == 13 ) {
+ /*if*/
+ 
+ buf [ strlen ( buf ) - 2 ]/*rbyte 1*/  =  '\0' ;
+ 
+ }
+ ;
+ 
+ #endif
+ ;
+ 
+_PUSH(& res , ( tos_clone ( buf ) ), tmp17, string) ;
+ 
+ }
+ ;
+ 
+ fclose ( fp ) ;
+
+ 
+ return  res ;
+ 
+ 
+ }
+ array_ustring os__read_ulines(string path) {
+ 
+array_string lines= os__read_lines ( path ) ;
+ 
+array_ustring ulines=new_array_from_c_array(0, 0, sizeof(ustring), (ustring[]) {   }) ;
+ 
+ array_string tmp20 =  lines;
+ ;
+for (int tmp21 = 0; tmp21 < tmp20 .len; tmp21 ++) {
+ string myline = ((string *) tmp20.data)[tmp21];
+ 
+_PUSH(& ulines , ( string_ustring( myline ) ), tmp22, ustring) ;
+ 
+ }
+ ;
+
+ 
+ return  ulines ;
+ 
+ 
+ }
+ Option_os__File os__open(string path) {
+ 
+byte* cpath= string_cstr( path ) ;
+ 
+os__File file= (os__File) { .cfile =  fopen ( cpath ,  "rb" ) } ;
+ 
+ if ( isnil ( file .cfile ) ) {
+ /*if*/
+
+ 
+ return  v_error ( _STR("failed to open file \"%.*s\"", path.len, path.str) ) ;
+ 
+ }
+ ;
+
+ 
+ return opt_ok(&  file , sizeof(os__File)) ;
+ 
+ 
+ }
+ Option_os__File os__create(string path) {
+ 
+byte* cpath= string_cstr( path ) ;
+ 
+os__File file= (os__File) { .cfile =  fopen ( cpath ,  "wb" ) } ;
+ 
+ if ( isnil ( file .cfile ) ) {
+ /*if*/
+
+ 
+ return  v_error ( _STR("failed to create file \"%.*s\"", path.len, path.str) ) ;
+ 
+ }
+ ;
+
+ 
+ return opt_ok(&  file , sizeof(os__File)) ;
+ 
+ 
+ }
+ Option_os__File os__open_append(string path) {
+ 
+byte* cpath= string_cstr( path ) ;
+ 
+os__File file= (os__File) { .cfile =  fopen ( cpath ,  "ab" ) } ;
+ 
+ if ( isnil ( file .cfile ) ) {
+ /*if*/
+
+ 
+ return  v_error ( _STR("failed to create file \"%.*s\"", path.len, path.str) ) ;
+ 
+ }
+ ;
+
+ 
+ return opt_ok(&  file , sizeof(os__File)) ;
+ 
+ 
+ }
+ void os__File_write(os__File f, string s) {
+ 
+string ss= string_clone( s ) ;
+ 
+ fputs ( string_cstr( ss ) ,  f .cfile ) ;
+ 
+ 
+ }
+ void os__File_write_bytes(os__File f, void* data, int size) {
+ 
+ fwrite ( data ,  1 ,  size ,  f .cfile ) ;
+ 
+ 
+ }
+ void os__File_write_bytes_at(os__File f, void* data, int size, int pos) {
+ 
+ fseek ( f .cfile ,  pos ,  SEEK_SET ) ;
+ 
+ fwrite ( data ,  1 ,  size ,  f .cfile ) ;
+ 
+ fseek ( f .cfile ,  0 ,  SEEK_END ) ;
+ 
+ 
+ }
+ void os__File_writeln(os__File f, string s) {
+ 
+ fputs ( string_cstr( s ) ,  f .cfile ) ;
+ 
+ fputs ( "\n" ,  f .cfile ) ;
+ 
+ 
+ }
+ void os__File_close(os__File f) {
+ 
+ fclose ( f .cfile ) ;
+ 
+ 
+ }
+ int os__system(string cmd) {
+ 
+void* ret= system ( string_cstr( cmd ) ) ;
+ 
+ if ( ret == - 1 ) {
+ /*if*/
+ 
+ os__print_c_errno ( ) ;
+ 
+ }
+ ;
+
+ 
+ return  ret ;
+ 
+ 
+ }
+ os__FILE* os__popen(string path) {
+ 
+byte* cpath= string_cstr( path ) ;
+ 
+ #ifdef _WIN32
+
+ 
+ return  _popen ( cpath ,  "r" ) ;
+ 
+ ;
+ 
+ #else
+
+ 
+ return  popen ( cpath ,  "r" ) ;
+ 
+ #endif
+ ;
+ 
+ 
+ }
+ string os__exec(string cmd) {
+ 
+ cmd  =  _STR("%.*s 2>&1", cmd.len, cmd.str) ;
+ 
+os__FILE* f= os__popen ( cmd ) ;
+ 
+ if ( isnil ( f ) ) {
+ /*if*/
+ 
+printf( "popen %.*s failed\n", cmd.len, cmd.str ) ;
+
+ 
+ return  tos2("") ;
+ 
+ }
+ ;
+ 
+byte buf  [1000 ]= {} /* arkek init*/ ;
+ 
+string res= tos2("") ;
+ 
+ while ( fgets ( buf ,  1000 ,  f ) != 0 ) {
+ 
+ res = string_add(res,  tos ( buf , strlen ( buf ) ) ) ;
+ 
+ }
+ ;
+
+ 
+ return  string_trim_space( res ) ;
+ 
+ 
+ }
+ string os__getenv(string key) {
+ 
+byte* s= getenv ( string_cstr( key ) ) ;
+ 
+ if ( isnil ( s ) ) {
+ /*if*/
+
+ 
+ return  tos2("") ;
+ 
+ }
+ ;
+
+ 
+ return  (tos2( s ) ) ;
+ 
+ 
+ }
+ int os__setenv(string name, string value, bool overwrite) {
+ 
+ #ifdef _WIN32
+ 
+ ;
+ 
+ #else
+
+ 
+ return  setenv ( string_cstr( name ) ,  string_cstr( value ) ,  overwrite ) ;
+ 
+ #endif
+ ;
+ 
+ 
+ }
+ int os__unsetenv(string name) {
+ 
+ #ifdef _WIN32
+ 
+ ;
+ 
+ #else
+
+ 
+ return  unsetenv ( string_cstr( name ) ) ;
+ 
+ #endif
+ ;
+ 
+ 
+ }
+ bool os__file_exists(string path) {
+ 
+ #ifdef _WIN32
+
+ 
+ return  _access ( path .str ,  0 ) != - 1 ;
+ 
+ #endif
+ ;
+
+ 
+ return  access ( path .str ,  0 ) != - 1 ;
+ 
+ 
+ }
+ bool os__dir_exists(string path) {
+ 
+ #ifdef _WIN32
+ 
+int attr= ((int)( GetFileAttributes ( string_cstr( path ) ) ) ) ;
+
+ 
+ return  attr == os__FILE_ATTRIBUTE_DIRECTORY ;
+ 
+ ;
+ 
+ #else
+ 
+void* dir= opendir ( string_cstr( path ) ) ;
+ 
+bool res= ! isnil ( dir ) ;
+ 
+ if ( res ) {
+ /*if*/
+ 
+ closedir ( dir ) ;
+ 
+ }
+ ;
+
+ 
+ return  res ;
+ 
+ #endif
+ ;
+ 
+ 
+ }
+ void os__mkdir(string path) {
+ 
+ #ifdef _WIN32
+ 
+ path  =  string_replace( path , tos2("/") , tos2("\\") ) ;
+ 
+ CreateDirectory ( string_cstr( path ) ,  0 ) ;
+ 
+ ;
+ 
+ #else
+ 
+ mkdir ( string_cstr( path ) ,  511 ) ;
+ 
+ #endif
+ ;
+ 
+ 
+ }
+ void os__rm(string path) {
+ 
+ #ifdef _WIN32
+ 
+ ;
+ 
+ #else
+ 
+ remove ( string_cstr( path ) ) ;
+ 
+ #endif
+ ;
+ 
+ 
+ }
+ void os__print_c_errno() {
+ 
+ 
+ }
+ string os__ext(string path) {
+ 
+int pos= string_last_index( path , tos2(".") ) ;
+ 
+ if ( pos == - 1 ) {
+ /*if*/
+
+ 
+ return  tos2("") ;
+ 
+ }
+ ;
+
+ 
+ return  string_right( path , pos ) ;
+ 
+ 
+ }
+ string os__path_sans_ext(string path) {
+ 
+int pos= string_last_index( path , tos2(".") ) ;
+ 
+ if ( pos == - 1 ) {
+ /*if*/
+
+ 
+ return  path ;
+ 
+ }
+ ;
+
+ 
+ return  string_left( path , pos ) ;
+ 
+ 
+ }
+ string os__basedir(string path) {
+ 
+int pos= string_last_index( path , tos2("/") ) ;
+ 
+ if ( pos == - 1 ) {
+ /*if*/
+
+ 
+ return  path ;
+ 
+ }
+ ;
+
+ 
+ return  string_left( path , pos + 1 ) ;
+ 
+ 
+ }
+ string os__filename(string path) {
+
+ 
+ return  string_all_after( path , tos2("/") ) ;
+ 
+ 
+ }
+ string os__get_line() {
+ 
+string str= os__get_raw_line ( ) ;
+ 
+ if ( string_at( str , str .len - 1) == '\n' ) {
+ /*if*/
+
+ 
+ return  string_substr( str , 0 , str .len - 1 ) ;
+ 
+ }
+ ;
+
+ 
+ return  str ;
+ 
+ 
+ }
+ string os__get_raw_line() {
+ 
+ #ifdef _WIN32
+ 
+int max= 256 ;
+ 
+byte* buf= v_malloc ( max ) ;
+ 
+void* h_input= GetStdHandle ( os__STD_INPUT_HANDLE ) ;
+ 
+ if ( h_input == os__INVALID_HANDLE_VALUE ) {
+ /*if*/
+ 
+ v_panic ( tos2("get_raw_line() error getting input handle.") ) ;
+ 
+ }
+ ;
+ 
+int nr_chars= 0 ;
+ 
+ ReadConsole ( h_input ,  buf ,  max ,  & /*vvar*/  nr_chars ,  0 ) ;
+ 
+ if ( nr_chars == 0 ) {
+ /*if*/
+
+ 
+ return  tos2("") ;
+ 
+ }
+ ;
+
+ 
+ return  tos ( buf , nr_chars ) ;
+ 
+ ;
+ 
+ #else
+ 
+u64 max= ((u64)( 256 ) ) ;
+ 
+byte* buf= v_malloc ( ((int)( max ) ) ) ;
+ 
+int nr_chars= getline ( & /*vvar*/  buf ,  & /*vvar*/  max ,  stdin ) ;
+ 
+ if ( nr_chars == 0 ) {
+ /*if*/
+
+ 
+ return  tos2("") ;
+ 
+ }
+ ;
+
+ 
+ return  tos ( buf , nr_chars ) ;
+ 
+ #endif
+ ;
+ 
+ 
+ }
+ string os__user_os() {
+ 
+ #ifdef __linux__
+
+ 
+ return  tos2("linux") ;
+ 
+ #endif
+ ;
+ 
+ #ifdef __APPLE__
+
+ 
+ return  tos2("mac") ;
+ 
+ #endif
+ ;
+ 
+ #ifdef _WIN32
+
+ 
+ return  tos2("windows") ;
+ 
+ #endif
+ ;
+
+ 
+ return  tos2("unknown") ;
+ 
+ 
+ }
+ string os__home_dir() {
+ 
+string home= os__getenv ( tos2("HOME") ) ;
+ 
+ #ifdef _WIN32
+ 
+ home  =  os__getenv ( tos2("HOMEDRIVE") ) ;
+ 
+ home = string_add(home,  os__getenv ( tos2("HOMEPATH") ) ) ;
+ 
+ #endif
+ ;
+ 
+ home = string_add(home,  tos2("/") ) ;
+
+ 
+ return  home ;
+ 
+ 
+ }
+ void os__write_file(string path, string text) {
+ 
+Option_os__File tmp53 =  os__create ( path ) ; if (!tmp53 .ok) {
+
+ 
+ return  ;
+ 
+ }
+ os__File f = *(os__File*) tmp53 . data;
+ ;
+ 
+ os__File_write( f , text ) ;
+ 
+ os__File_close( f ) ;
+ 
+ 
+ }
+ void os__clear() {
+ 
+ printf ( "\x1b[2J" ) ;
+ 
+ printf ( "\x1b[H" ) ;
+ 
+ 
+ }
+ void os__on_segfault(void* f) {
+ 
+ #ifdef _WIN32
+
+ 
+ return  ;
+ 
+ #endif
+ ;
+ 
+ #ifdef __APPLE__
+struct /*c struct init*/
+ 
+sigaction sa= (struct sigaction) { .sa_mask = 0 , .sa_sigaction = 0 , .sa_flags = 0 } ;
+ 
+ memset ( & /*vvar*/  sa ,  0 ,  sizeof( sigaction) ) ;
+ 
+ sigemptyset ( & /*vvar*/  sa .sa_mask ) ;
+ 
+ sa .sa_sigaction  =  f ;
+ 
+ sa .sa_flags  =  SA_SIGINFO ;
+ 
+ sigaction ( SIGSEGV ,  & /*vvar*/  sa ,  0 ) ;
+ 
+ #endif
+ ;
+ 
+ 
+ }
+ string os__getexepath() {
+ 
+byte result  [4096 ]= {} /* arkek init*/ ;
+ 
+ #ifdef __linux__
+ 
+int count= ((int)( readlink ( "/proc/self/exe" ,  result ,  os__MAX_PATH ) ) ) ;
+ 
+ if ( (/*lpar*/ count < 0 ) ) {
+ /*if*/
+ 
+ v_panic ( tos2("error reading /proc/self/exe to get exe path") ) ;
+ 
+ }
+ ;
+
+ 
+ return  tos ( result , count ) ;
+ 
+ #endif
+ ;
+ 
+ #ifdef _WIN32
+ 
+int ret= ((int)( GetModuleFileName ( 0 ,  result ,  os__MAX_PATH ) ) ) ;
+
+ 
+ return  tos ( result , ret ) ;
+ 
+ #endif
+ ;
+ 
+ #ifdef __APPLE__
+
+ 
+ return  tos2("") ;
+ 
+ #endif
+ ;
+ 
+ 
+ }
+ bool os__is_dir(string path) {
+ 
+ #ifdef _WIN32
+ 
+int val= ((int)( GetFileAttributes ( string_cstr( path ) ) ) ) ;
+
+ 
+ return  val & os__FILE_ATTRIBUTE_DIRECTORY > 0 ;
+ 
+ ;
+ 
+ #else
+struct /*c struct init*/
+ 
+stat statbuf= (struct stat) { .st_size = 0 , .st_mode = 0 } ;
+ 
+byte* cstr= string_cstr( path ) ;
+ 
+ if ( stat ( cstr ,  & /*vvar*/  statbuf ) != 0 ) {
+ /*if*/
+
+ 
+ return  0 ;
+ 
+ }
+ ;
+
+ 
+ return  statbuf .st_mode & S_IFMT == S_IFDIR ;
+ 
+ #endif
+ ;
+ 
+ 
+ }
+ void os__chdir(string path) {
+ 
+ #ifdef _WIN32
+ 
+ _chdir ( string_cstr( path ) ) ;
+ 
+ ;
+ 
+ #else
+ 
+ chdir ( string_cstr( path ) ) ;
+ 
+ #endif
+ ;
+ 
+ 
+ }
+ string os__getwd() {
+ 
+byte* buf= v_malloc ( 512 ) ;
+ 
+ #ifdef _WIN32
+ 
+ if ( _getcwd ( buf ,  512 ) == 0 ) {
+ /*if*/
+
+ 
+ return  tos2("") ;
+ 
+ }
+ ;
+ 
+ ;
+ 
+ #else
+ 
+ if ( getcwd ( buf ,  512 ) == 0 ) {
+ /*if*/
+
+ 
+ return  tos2("") ;
+ 
+ }
+ ;
+ 
+ #endif
+ ;
+
+ 
+ return  (tos2( buf ) ) ;
+ 
+ 
+ }
+ array_string os__ls(string path) {
+ 
+ #ifdef _WIN32
+ 
+os__win32finddata find_file_data= (os__win32finddata) { } ;
+ 
+array_string dir_files=new_array_from_c_array(0, 0, sizeof(string), (string[]) {   }) ;
+ 
+ if ( ! os__dir_exists ( path ) ) {
+ /*if*/
+ 
+printf( "ls() couldnt open dir \"%.*s\" (does not exist).\n", path.len, path.str ) ;
+
+ 
+ return  dir_files ;
+ 
+ }
+ ;
+ 
+string path_files= _STR("%.*s\\*", path.len, path.str) ;
+ 
+void* h_find_files= FindFirstFile ( string_cstr( path_files ) ,  & /*vvar*/  find_file_data ) ;
+ 
+string first_filename= tos ( & /*vvar*/  find_file_data .cFileName , strlen ( find_file_data .cFileName ) ) ;
+ 
+ if (string_ne( first_filename , tos2(".") )  && string_ne( first_filename , tos2("..") ) ) {
+ /*if*/
+ 
+_PUSH(& dir_files , ( first_filename ), tmp67, string) ;
+ 
+ }
+ ;
+ 
+ while ( FindNextFile ( h_find_files ,  & /*vvar*/  find_file_data ) ) {
+ 
+string filename= tos ( & /*vvar*/  find_file_data .cFileName , strlen ( find_file_data .cFileName ) ) ;
+ 
+ if (string_ne( filename , tos2(".") )  && string_ne( filename , tos2("..") ) ) {
+ /*if*/
+ 
+_PUSH(& dir_files , ( string_clone( filename ) ), tmp69, string) ;
+ 
+ }
+ ;
+ 
+ }
+ ;
+ 
+ FindClose ( h_find_files ) ;
+
+ 
+ return  dir_files ;
+ 
+ ;
+ 
+ #else
+ 
+array_string res=new_array_from_c_array(0, 0, sizeof(string), (string[]) {   }) ;
+ 
+void* dir= opendir ( path .str ) ;
+ 
+ if ( isnil ( dir ) ) {
+ /*if*/
+ 
+printf( "ls() couldnt open dir \"%.*s\"\n", path.len, path.str ) ;
+ 
+ os__print_c_errno ( ) ;
+
+ 
+ return  res ;
+ 
+ }
+ ;
+struct /*c struct init*/
+ 
+dirent* ent= 0 ;
+ 
+ while (1) { 
+ ent  =  readdir ( dir ) ;
+ 
+ if ( isnil ( ent ) ) {
+ /*if*/
+ 
+ break
+ ;
+ 
+ }
+ ;
+ 
+string name= tos_clone ( ent ->d_name ) ;
+ 
+ if (string_ne( name , tos2(".") )  && string_ne( name , tos2("..") )  && string_ne( name , tos2("") ) ) {
+ /*if*/
+ 
+_PUSH(& res , ( name ), tmp74, string) ;
+ 
+ }
+ ;
+ 
+ }
+ ;
+ 
+ closedir ( dir ) ;
+
+ 
+ return  res ;
+ 
+ #endif
+ ;
+ 
+ 
+ }
+ void os__signal(int signum, void* handler) {
+ 
+ signal ( signum ,  handler ) ;
+ 
+ 
+ }
+ void os__log(string s) {
+ 
+ 
+ }
+ void os__print_backtrace() {
+ 
+ 
+ }
  int main(int argc, char** argv) {
  init_consts();
+ os__args = os__init_os_args(argc, argv);
  
  println ( tos2("Hello Sirius IV") ) ;
  
@@ -3604,14 +6049,16 @@ vex__Game* game= vex__create_game ( (vex__Config) { .title =  tos2("Shmupwarz") 
   else { 
  /*else if*/
  
- while ( vex__Game_is_running(& /* ? */* game ) ) {
+ while ( vex__Game_is_running( game ) ) {
  
- vex__Game_update(& /* ? */* game ) ;
+ vex__Game_update( game ) ;
  
- vex__Game_render(& /* ? */* game ) ;
+ vex__Game_render( game ) ;
  
  }
  ;
+ 
+ vex__Game_quit( game ) ;
  
  }
  ;
@@ -3620,9 +6067,9 @@ vex__Game* game= vex__create_game ( (vex__Config) { .title =  tos2("Shmupwarz") 
  }
  void main_loop(vex__Game* game) {
  
- vex__Game_update(& /* ? */* game ) ;
+ vex__Game_update( game ) ;
  
- vex__Game_render(& /* ? */* game ) ;
+ vex__Game_render( game ) ;
  
  
  }
@@ -3638,13 +6085,13 @@ vex__SDL_MOUSEBUTTONDOWN =  0x0401;
 vex__SDL_MOUSEBUTTONUP =  0x0402;
 vex__SDL_GL_DOUBLEBUFFER =  0x0c32;
 vex__IMG_INIT_PNG =  0x00000002;
-vex__GL_CULL_FACE =  0x00000b44;
+vex__GL_CULL_FACE =  0x0b44;
 vex__GL_BLEND =  0x0be2;
 vex__GL_SRC_ALPHA =  0x0302;
 vex__GL_ONE_MINUS_SRC_ALPHA =  0x0303;
-vex__GL_COLOR_BUFFER_BIT =  0x00004000;
-vex__GL_DEPTH_BUFFER_BIT =  0x000000100;
-vex__GL_STENCIL_BUFFER_BIT =  0x000000400;
+vex__GL_COLOR_BUFFER_BIT =  0x4000;
+vex__GL_DEPTH_BUFFER_BIT =  0x0100;
+vex__GL_STENCIL_BUFFER_BIT =  0x0400;
 vex__GL_TEXTURE_1D =  0x0de0;
 vex__GL_TEXTURE_2D =  0x0de1;
 vex__GL_TEXTURE_WRAP_S =  0x2802;
@@ -3655,7 +6102,77 @@ vex__GL_RGB =  0x1907;
 vex__GL_RGBA =  0x1908;
 vex__GL_REPEAT =  0x2901;
 vex__GL_LINEAR =  0x2601;
-vex__GL_UNSIGNED_BYTE =  0x1401; }
+vex__GL_VERTEX_SHADER =  0x8b31;
+vex__GL_FRAGMENT_SHADER =  0x8b30;
+vex__GL_COMPILE_STATUS =  0x8b81;
+vex__GL_LINK_STATUS =  0x8b82;
+vex__GL_ARRAY_BUFFER =  0x8892;
+vex__GL_STATIC_DRAW =  0x88e4;
+vex__GL_BYTE =  0x1400;
+vex__GL_UNSIGNED_BYTE =  0x1401;
+vex__GL_SHORT =  0x1402;
+vex__GL_UNSIGNED_SHORT =  0x1403;
+vex__GL_INT =  0x1404;
+vex__GL_UNSIGNED_INT =  0x1405;
+vex__GL_FLOAT =  0x1406;
+vex__GL_2_BYTES =  0x1407;
+vex__GL_3_BYTES =  0x1408;
+vex__GL_4_BYTES =  0x1409;
+vex__GL_DOUBLE =  0x140a;
+vex__GL_TEXTURE0 =  0xb4c0;
+vex__GL_POINTS =  0x0000;
+vex__GL_LINES =  0x0001;
+vex__GL_LINE_LOOP =  0x0002;
+vex__GL_LINE_STRIP =  0x0003;
+vex__GL_TRIANGLES =  0x0004;
+vex__GL_TRIANGLE_STRIP =  0x0005;
+vex__GL_TRIANGLE_FAN =  0x0006;
+vex__GL_QUADS =  0x0007;
+vex__GL_QUAD_STRIP =  0x0008;
+vex__GL_POLYGON =  0x0009;
+math__Log2E =  1.0 / math__Ln2;
+math__Log10E =  1.0 / math__Ln10;
+os__FILE_ATTR_READONLY =  0x1;
+os__FILE_ATTR_HIDDEN =  0x2;
+os__FILE_ATTR_SYSTEM =  0x4;
+os__FILE_ATTR_DIRECTORY =  0x10;
+os__FILE_ATTR_ARCHIVE =  0x20;
+os__FILE_ATTR_DEVICE =  0x40;
+os__FILE_ATTR_NORMAL =  0x80;
+os__FILE_ATTR_TEMPORARY =  0x100;
+os__FILE_ATTR_SPARSE_FILE =  0x200;
+os__FILE_ATTR_REPARSE_POINT =  0x400;
+os__FILE_ATTR_COMPRESSED =  0x800;
+os__FILE_ATTR_OFFLINE =  0x1000;
+os__FILE_ATTR_NOT_CONTENT_INDEXED =  0x2000;
+os__FILE_ATTR_ENCRYPTED =  0x4000;
+os__FILE_ATTR_INTEGRITY_STREAM =  0x8000;
+os__FILE_ATTR_VIRTUAL =  0x10000;
+os__FILE_ATTR_NO_SCRUB_DATA =  0x20000;
+os__FILE_TYPE_DISK =  0x1;
+os__FILE_TYPE_CHAR =  0x2;
+os__FILE_TYPE_PIPE =  0x3;
+os__FILE_TYPE_UNKNOWN =  0x0;
+os__FILE_INVALID_FILE_ID =  (/*lpar*/ - 1 );
+os__INVALID_HANDLE_VALUE =  - 1;
+os__STD_INPUT_HANDLE =  - 10;
+os__STD_OUTPUT_HANDLE =  - 11;
+os__STD_ERROR_HANDLE =  - 12;
+os__ENABLE_ECHO_INPUT =  0x0004;
+os__ENABLE_EXTENDED_FLAGS =  0x0080;
+os__ENABLE_INSERT_MODE =  0x0020;
+os__ENABLE_LINE_INPUT =  0x0002;
+os__ENABLE_MOUSE_INPUT =  0x0010;
+os__ENABLE_PROCESSED_INPUT =  0x0001;
+os__ENABLE_QUICK_EDIT_MODE =  0x0040;
+os__ENABLE_WINDOW_INPUT =  0x0008;
+os__ENABLE_VIRTUAL_TERMINAL_INPUT =  0x0200;
+os__ENABLE_PROCESSED_OUTPUT =  0x0001;
+os__ENABLE_WRAP_AT_EOL_OUTPUT =  0x0002;
+os__ENABLE_VIRTUAL_TERMINAL_PROCESSING =  0x0004;
+os__DISABLE_NEWLINE_AUTO_RETURN =  0x0008;
+os__ENABLE_LVB_GRID_WORLDWIDE =  0x0010;
+os__args = new_array_from_c_array(0, 0, sizeof(string), (string[]) {   }); }
  
 string _STR(const char *fmt, ...) {
 	va_list argptr;

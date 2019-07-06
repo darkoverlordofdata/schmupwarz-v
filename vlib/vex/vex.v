@@ -14,6 +14,31 @@ module vex
 
 #include "vex.h"
 
+struct C.SDL_Rect {
+    x int
+    y int
+    w int
+    h int
+}
+struct C.SDL_Surface {
+    flags u32
+    format voidptr
+    w int
+    h int
+    pitch int
+    pixels voidptr
+    userdata voidptr
+    locked int
+    lock_data voidptr
+    clip_rect C.SDL_Rect
+    map voidptr
+    refcount int
+}
+
+
+/**
+ *
+ */
 const (
     SDL_WINDOWPOS_CENTERED = 0
     SDL_WINDOW_OPENGL = 2
@@ -36,14 +61,17 @@ const (
     SDLK_ESCAPE = 27
 )
 
+/**
+ *
+ */
 const (
-    GL_CULL_FACE =                  0x00000b44
+    GL_CULL_FACE =                  0x0b44
     GL_BLEND =                      0x0be2
     GL_SRC_ALPHA =                  0x0302
     GL_ONE_MINUS_SRC_ALPHA =        0x0303
-    GL_COLOR_BUFFER_BIT =           0x00004000
-    GL_DEPTH_BUFFER_BIT =           0x000000100
-    GL_STENCIL_BUFFER_BIT =         0x000000400
+    GL_COLOR_BUFFER_BIT =           0x4000
+    GL_DEPTH_BUFFER_BIT =           0x0100
+    GL_STENCIL_BUFFER_BIT =         0x0400
     GL_TEXTURE_1D =                 0x0de0
     GL_TEXTURE_2D =                 0x0de1
     GL_TEXTURE_WRAP_S = 		    0x2802
@@ -54,27 +82,44 @@ const (
     GL_RGBA	= 				        0x1908
     GL_REPEAT = 				    0x2901
     GL_LINEAR =				        0x2601
+    GL_VERTEX_SHADER =              0x8b31
+    GL_FRAGMENT_SHADER =            0x8b30
+    GL_COMPILE_STATUS =             0x8b81
+    GL_LINK_STATUS =                0x8b82
+    GL_ARRAY_BUFFER =               0x8892
+    GL_STATIC_DRAW =                0x88e4
+    GL_BYTE =					    0x1400
     GL_UNSIGNED_BYTE =			    0x1401
+    GL_SHORT =				        0x1402
+    GL_UNSIGNED_SHORT =			    0x1403
+    GL_INT =					    0x1404
+    GL_UNSIGNED_INT =				0x1405
+    GL_FLOAT =				        0x1406
+    GL_2_BYTES =				    0x1407
+    GL_3_BYTES =				    0x1408
+    GL_4_BYTES =				    0x1409
+    GL_DOUBLE =				        0x140a
+    GL_FALSE =				            0
+    GL_TRUE =					        1
+    GL_TEXTURE0	=			        0xb4c0
+    GL_POINTS =				        0x0000
+    GL_LINES =				        0x0001
+    GL_LINE_LOOP =				    0x0002
+    GL_LINE_STRIP =				    0x0003
+    GL_TRIANGLES =				    0x0004
+    GL_TRIANGLE_STRIP =			    0x0005
+    GL_TRIANGLE_FAN =				0x0006
+    GL_QUADS =				        0x0007
+    GL_QUAD_STRIP =				    0x0008
+    GL_POLYGON =				    0x0009
+
 
 )
 
 
-struct Game {
-pub mut:
-	window voidptr
-	title string
-    width int
-    height int
-	x int
-	y  int
-    running bool
-    mouseX int
-    mouseY int
-    mouseDown bool
-    delta double
-    keys []int
-}
-
+/**
+ *
+ */
 struct Config 
 {
     title string
@@ -86,6 +131,9 @@ struct Config
 }
 
 
+/**
+ *
+ */
 struct Event {
 pub:
     typ u32
@@ -104,33 +152,3 @@ pub:
     pada int
 }
 
-struct Texture2D {
-pub mut:
-    id  u32
-    width u32
-    height u32
-    internal_format u32
-    image_format u32
-    wrap_s u32
-    wrap_t u32
-    filter_min u32
-    filter_mag u32
-    path string
-}
-
-struct Shader {
-pub:
-    id u32
-}
-
-struct ResourceManager {
-pub:
-    shaders map[string]Shader
-    textures map[string]Texture2D
-}
-
-struct SpriteRenderer {
-pub:
-    shader Shader
-    quad_vao u32
-}

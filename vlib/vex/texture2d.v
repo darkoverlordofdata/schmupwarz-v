@@ -8,20 +8,43 @@ module vex
 
 #include "vex.h"
 
-pub fn create_texture2d(path string) *Texture2D
+/**
+ *
+ */
+struct Texture2D {
+pub mut:
+    id  u32
+    width u32
+    height u32
+    internal_format u32
+    image_format u32
+    wrap_s u32
+    wrap_t u32
+    filter_min u32
+    filter_mag u32
+    path string
+}
+
+
+/**
+ * Texture2D::Init
+ */
+pub fn(t mut Texture2D) init(path string) 
 {
-    mut t := &Texture2D{ path: path }
-    C.glGenTextures(1, &t.id)
+    t.path = path
     t.internal_format = u32(GL_RGB)
     t.image_format = u32(GL_RGB)
     t.wrap_s = u32(GL_REPEAT)
     t.wrap_t = u32(GL_REPEAT)
     t.filter_min = u32(GL_LINEAR)
     t.filter_mag = u32(GL_LINEAR)
-    return t
+    C.glGenTextures(1, &t.id)
 }
 
-pub fn(t &Texture2D) generate(width int, height int, data voidptr)
+/**
+ * Texture2D::Generate
+ */
+pub fn(t mut Texture2D) generate(width int, height int, data voidptr)
 {
     t.width = u32(width)
     t.height = u32(height)
@@ -34,7 +57,11 @@ pub fn(t &Texture2D) generate(width int, height int, data voidptr)
     C.glBindTexture(GL_TEXTURE_2D, 0)
 }
 
-pub fn(t &Texture2D) bind()
+/**
+ * Texture2D::Bind
+ */
+pub fn(t mut Texture2D) bind()
 {
     C.glBindTexture(GL_TEXTURE_2D, t.id)
 }
+

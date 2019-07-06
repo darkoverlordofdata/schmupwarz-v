@@ -6,15 +6,23 @@
   "vala": "0.26",
   "c": "11",
   "cpp": "17",
-  "authors": ["darkoverlordofdata"],
+  "authors": [
+    "darkoverlordofdata"
+  ],
   "description": "shmupwarz",
   "license": "MIT",
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "glm": "git://github.com/darkoverlordofdata/doran-glm"
+  },
   "source": "src",
   "files": [
+    "src/main.c",
+    "src/shmupwarz",
     "src/shmupwarz.c",
-    "src/shmupwarz.v"
+    "src/shmupwarz.v",
+    "src/test",
+    "src/test.v"
   ],
   "packages": null,
   "includes": [

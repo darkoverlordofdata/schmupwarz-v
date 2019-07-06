@@ -9,6 +9,9 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #endif
+#include <math.h>
+
+
 
 /**
  * Desktop only - load glProc addresses
@@ -19,6 +22,7 @@ void vexInit() {
     glewInit();
     glGetError(); // Call it once to catch glewInit() bug, all other errors are now from our application.
     #endif
+
 }
 
 /**

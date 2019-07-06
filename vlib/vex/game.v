@@ -8,6 +8,29 @@ module vex
 
 #include "vex.h"
 
+/**
+ *
+ */
+struct Game {
+pub mut:
+	window voidptr
+	title string
+    width int
+    height int
+	x int
+	y int
+    running bool
+    mouseX int
+    mouseY int
+    mouseDown bool
+    delta double
+    resource_manager *ResourceManager
+    keys []int
+}
+
+/**
+ * CreateGame
+ */
 pub fn create_game(cfg Config) *Game 
 {
     if C.SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER | SDL_INIT_AUDIO) {
@@ -38,12 +61,16 @@ pub fn create_game(cfg Config) *Game
     C.glEnable(GL_BLEND)
     C.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-    g := &Game{ window: w, title: cfg.title, running: true, keys: [0; 256] }
+    mut g := &Game{ window: w, title: cfg.title, running: true, keys: [0; 256] }
+    // g.resource_manager = create_resource_manager()
 
     return g
 }
 
-pub fn (g &Game) process_event()
+/**
+ * Game::ProcessEvents
+ */
+pub fn (g mut Game) process_event()
 {
     event := Event{}
     mut key := 0
@@ -82,7 +109,10 @@ pub fn (g &Game) process_event()
     }
 } 
 
-pub fn (g &Game) is_running() bool 
+/**
+ * Game::IsRunning
+ */
+pub fn (g mut Game) is_running() bool 
 {
     g.process_event()
     if g.keys[SDLK_ESCAPE] == 1 {
@@ -91,12 +121,18 @@ pub fn (g &Game) is_running() bool
     return g.running
 }
 
-pub fn (g &Game) update()
+/**
+ * Game::Update
+ */
+pub fn (g mut Game) update()
 {
 
 }
 
-pub fn (g &Game) render()
+/**
+ * Game::Render
+ */
+pub fn (g mut Game) render()
 {
     C.glClearColor(1.0, 0.0, 0.0, 1.0)
 	C.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)
@@ -104,7 +140,10 @@ pub fn (g &Game) render()
     C.SDL_GL_SwapWindow(g.window)
 }
 
-pub fn (g &Game) terminate() 
+/**
+ * Game::Quit
+ */
+pub fn (g mut Game) quit() 
 {
     C.SDL_DestroyWindow(g.window)
 	C.IMG_Quit()

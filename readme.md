@@ -16,3 +16,22 @@ uses V 0.1.11
 
 * Hello Triangle - next
 
+struct Texture2D {
+pub mut:
+    id  u32
+    path string
+}
+
+pub fn test()
+{
+    s := []Texture2D
+    t := map[string]f32{}
+    u := map[string]Texture2D{}
+
+}
+
+map init unknown type "Texture2D"
+
+
+using https://github.com/recp/cglm  (Highly Optimized Graphics Math (glm) for C)
+rather than builtin glm. Why re-invent the wheel?

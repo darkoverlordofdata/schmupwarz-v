@@ -1,11 +1,12 @@
 import vex
 import emscripten
 
-fn main() {
 
+fn main() {
     println('Hello Sirius IV')
 
-    game := vex.create_game(vex.Config {
+
+    mut game := vex.create_game(vex.Config {
         title: 'Shmupwarz'
         width: 640
         height: 480
@@ -21,11 +22,13 @@ fn main() {
             game.update()
             game.render()
         }
+        game.quit()
     }
 }
 
 
-fn main_loop(game &vex.Game) {
+fn main_loop(game mut vex.Game) {
     game.update()
     game.render()
 }
+
