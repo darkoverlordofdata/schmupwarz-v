@@ -129,6 +129,8 @@ typedef struct Tween Tween;
 typedef struct Sprite Sprite;
 typedef struct Entity Entity;
 typedef struct Shmup Shmup;
+typedef array array_vex__Vec2;
+typedef array array_Entity;
 typedef array array_f32;
 typedef Option Option_string;
 typedef Option Option_os__File;
@@ -306,6 +308,15 @@ vex__Vec2 velocity;
 }; 
 struct /*kind*/ Shmup {
 vex__Game* game;
+array_vex__Vec2 bullets;
+array_vex__Vec2 enemies1;
+array_vex__Vec2 enemies2;
+array_vex__Vec2 enemies3;
+array_vex__Vec2 explosions;
+array_vex__Vec2 bangs;
+array_vex__Vec2 particles;
+array_Entity entities;
+Entity* player;
 }; 
 
 string _STR(const char*, ...);
@@ -593,6 +604,7 @@ array_string os__ls(string path);
 void os__signal(int signum, void* handler);
 void os__log(string s);
 void os__print_backtrace();
+void main_loop(Shmup* game);
 Shmup* create_shmup();
 void Shmup_update(Shmup* s);
 void Shmup_render(Shmup* s);
@@ -6119,6 +6131,15 @@ _PUSH(& res , ( name ), tmp74, string) ;
  
 Shmup* shmup= create_shmup ( ) ;
  
+ if ( emscripten__is_enabled ( ) == 1 ) {
+ /*if*/
+ 
+ emscripten__set_main_loop_arg ( main_loop , shmup , 60 , 0 ) ;
+ 
+ }
+  else { 
+ /*else if*/
+ 
  while ( Shmup_is_running( shmup ) ) {
  
  Shmup_update( shmup ) ;
@@ -6130,12 +6151,23 @@ Shmup* shmup= create_shmup ( ) ;
  
  Shmup_quit( shmup ) ;
  
+ }
+ ;
+ 
+ 
+ }
+ void main_loop(Shmup* game) {
+ 
+ Shmup_update( game ) ;
+ 
+ Shmup_render( game ) ;
+ 
  
  }
  Shmup* create_shmup() {
 
  
- return  ALLOC_INIT(Shmup, { .game =  vex__create_game ( (vex__Config) { .title =  tos2("Shmupwarz") , .width =  640 , .height =  480 , .major =  3 , .minor =  0 , .images =  vex__IMG_INIT_PNG } ) } ) ;
+ return  ALLOC_INIT(Shmup, { .game =  vex__create_game ( (vex__Config) { .title =  tos2("Shmupwarz") , .width =  640 , .height =  480 , .major =  3 , .minor =  0 , .images =  vex__IMG_INIT_PNG } ) , .bullets = new_array_from_c_array(0, 0, sizeof(vex__Vec2), (vex__Vec2[]) {   }) , .enemies1 = new_array_from_c_array(0, 0, sizeof(vex__Vec2), (vex__Vec2[]) {   }) , .enemies2 = new_array_from_c_array(0, 0, sizeof(vex__Vec2), (vex__Vec2[]) {   }) , .enemies3 = new_array_from_c_array(0, 0, sizeof(vex__Vec2), (vex__Vec2[]) {   }) , .explosions = new_array_from_c_array(0, 0, sizeof(vex__Vec2), (vex__Vec2[]) {   }) , .bangs = new_array_from_c_array(0, 0, sizeof(vex__Vec2), (vex__Vec2[]) {   }) , .particles = new_array_from_c_array(0, 0, sizeof(vex__Vec2), (vex__Vec2[]) {   }) , .entities = new_array_from_c_array(0, 0, sizeof(Entity), (Entity[]) {   }) , .player = 0 } ) ;
  
  
  }

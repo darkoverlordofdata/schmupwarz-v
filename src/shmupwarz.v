@@ -8,11 +8,19 @@ fn main() {
 
     mut shmup := create_shmup()
 
-    for shmup.is_running() {
-        shmup.update()
-        shmup.render()
+    if emscripten.is_enabled() == true {
+        emscripten.set_main_loop_arg(main_loop, shmup, 60, 0)
+    } else {
+        for shmup.is_running() {
+            shmup.update()
+            shmup.render()
+        }
+        shmup.quit()
     }
-    shmup.quit()
+}
+fn main_loop(game mut Shmup) {
+    game.update()
+    game.render()
 }
 
 
@@ -90,15 +98,15 @@ mut:
 struct Shmup {
 mut:
     game &vex.Game
-    // bullets []vex.Vec2
-    // enemies1 []vex.Vec2
-    // enemies2 []vex.Vec2
-    // enemies3 []vex.Vec2
-    // explosions []vex.Vec2
-    // bangs []vex.Vec2
-    // particles []vex.Vec2
-    // entities []Entity
-    // player &Entity
+    bullets []vex.Vec2
+    enemies1 []vex.Vec2
+    enemies2 []vex.Vec2
+    enemies3 []vex.Vec2
+    explosions []vex.Vec2
+    bangs []vex.Vec2
+    particles []vex.Vec2
+    entities []Entity
+    player &Entity
 }
 
 pub fn create_shmup() *Shmup {
@@ -111,14 +119,14 @@ pub fn create_shmup() *Shmup {
                 minor: 0
                 images: vex.IMG_INIT_PNG
             })
-            // bullets: []vex.Vec2
-            // enemies1: []vex.Vec2
-            // enemies2: []vex.Vec2
-            // enemies3: []vex.Vec2
-            // explosions: []vex.Vec2
-            // bangs: []vex.Vec2
-            // particles: []vex.Vec2
-            // entities: []Entity
+            bullets: []vex.Vec2
+            enemies1: []vex.Vec2
+            enemies2: []vex.Vec2
+            enemies3: []vex.Vec2
+            explosions: []vex.Vec2
+            bangs: []vex.Vec2
+            particles: []vex.Vec2
+            entities: []Entity
     }
 }
 
@@ -138,32 +146,3 @@ fn (s mut Shmup) quit() {
     s.game.quit()
 }
 
-// fn main() {
-//     println('Hello Sirius IV')
-
-
-//     mut game := vex.create_game(vex.Config {
-//         title: 'Shmupwarz'
-//         width: 640
-//         height: 480
-//         major: 3
-//         minor: 0
-//         images: vex.IMG_INIT_PNG
-//     })
-
-//     if emscripten.is_enabled() == true {
-//         emscripten.set_main_loop_arg(main_loop, game, 60, 0)
-//     } else {
-//         for game.is_running() {
-//             game.update()
-//             game.render()
-//         }
-//         game.quit()
-//     }
-// }
-
-
-// fn main_loop(game mut vex.Game) {
-//     game.update()
-//     game.render()
-// }
