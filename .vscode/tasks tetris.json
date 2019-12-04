@@ -5,8 +5,7 @@
             "label": "build",
             "command": "clang",
             "args": [
-                "-std=c18",
-                "${workspaceFolder}/build/tetris.c",
+                "${workspaceFolder}/src/tetris.c",
                 "-I${workspaceFolder}/thirdparty/glad",
                 "-I${workspaceFolder}/thirdparty/stb_image",
                 "-I/usr/include/freetype2",
@@ -30,7 +29,7 @@
             "label": "prebuild",
             "command": "v",
             "args": [
-                "-o", "${workspaceFolder}/build/tetris.c",
+                "-o", "${workspaceFolder}/src/tetris.c",
                 "${workspaceFolder}/src/tetris.v"
             ],
             "group": "build",

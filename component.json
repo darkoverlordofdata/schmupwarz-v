@@ -17,12 +17,12 @@
   },
   "source": "src",
   "files": [
-    "src/main.c",
-    "src/shmupwarz",
-    "src/shmupwarz.c",
     "src/shmupwarz.v",
-    "src/test",
-    "src/test.v"
+    "src/test.v",
+    "src/tetris.v",
+    "src/tetris/.gitignore",
+    "src/tetris/tetris",
+    "src/tetris/tetris.v"
   ],
   "packages": null,
   "includes": [
@@ -50,5 +50,8 @@
   "symbols": [],
   "copy": null,
   "vapidir": "/src/vapis",
-  "console": false
+  "console": false,
+  "cflags": "",
+  "cppflags": "",
+  "links": null
 }

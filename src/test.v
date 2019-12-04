@@ -2,16 +2,16 @@ struct User {
 	name string 
 } 
 
-struct A {
+struct Record {
 	m map[string]int 
 	users map[string]User 
 }
 
-fn (a mut A) set(key string, val int) {
-	a.m[key] = val
+fn (self mut Record) set(key string, val int) {
+	self.m[key] = val
 }
 
-fn test_map() {
+fn main() {
 	mut m := map[string]int{}
 	m['hi'] = 80
 	assert m['hi'] == 80
@@ -21,7 +21,8 @@ fn test_map() {
 	peter := users['1']
 	assert  peter.name == 'Peter' 
 
-	mut a := A{
+	println("name = $peter.name")
+	mut a := Record{
 		m: map[string]int{} 
 		users: map[string]User{} 
 	}

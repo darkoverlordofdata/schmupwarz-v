@@ -1,0 +1,28 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "clang",
+            "args": [
+                "${workspaceFolder}/src/shmupwarz.c",
+                "-o", "${workspaceFolder}/build/shmupwarz"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+
+            },
+            "dependsOn":["prebuild"]
+        },
+        {
+            "label": "prebuild",
+            "command": "v",
+            "args": [
+                "-o", "${workspaceFolder}/src/shmupwarz.c",
+                "${workspaceFolder}/src/shmupwarz.v"
+            ],
+            "group": "build",
+        }
+    ]
+}
